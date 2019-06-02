@@ -1,0 +1,11 @@
+# was mache ich als naechstes?
+# 1. wie funktioniert die reconstruction?
+# 2. zaehle wie viele events insgesamt(decays von kaonen plotten) -> fertig
+# 3. insgesamt gegen nur die, die in pi+ pi- zerfallen -> fertig
+# 4. wie viele insgesamt fuer lambdas? -> fertig
+# 5. plotte gesamt, gegen die zerfaelle in p und pi- ->> wie geht das?
+# 6. vector<int> * Track_PID;
+# 7  vector<int> * Track_Charge;
+
+# als erstes mit 7. nur positiv geladene tracks nehmen
+# mit 6. kann ich die TrackPID auf die eines protons ueberpruefen

@@ -1,0 +1,13 @@
+by Johannes Erdmann, March 2019
+
+#### compile
+make
+
+#### clean up
+make clean
+
+#### run reconstruction
+./runKaonRecoEtc.exe
+
+#### make (overlay) histograms
+./makeHistograms.exe

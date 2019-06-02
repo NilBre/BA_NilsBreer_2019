@@ -1,0 +1,14 @@
+# Decay Channel total primary_channel_count other_count BR(to primary channel) uncertainty BR(PDG 2018) deltaP(prozentuale abweichung zum pdg) recoLambdas
+# name anzahl anzahl anzahl prozent prozent prozent prozent
+  10_k_kaon_s   4269       2996       1273       70.180   69.20 +- 0.05 1.098
+  10_k_kaon_d   2627       1860        767       70.803   69.20 +- 0.05 1.108
+  10_k_kaon_u   2344       1661        683       70.862   69.20 +- 0.05 1.109
+  10_M_kaon_s   4.18467e+6 2.97409e+6 1.21058e+6 71.0712  69.20 +- 0.05 1.11223
+  10_M_kaon_d   2.60665e+6 1.85179e+6 754857     71.9411  69.20 +- 0.05 1.11176
+  10_M_kaon_u
+  10_k_lambda_s 1378       919    459    66.691   63.9 +- 0.05 0.964    337
+  10_k_lambda_d 1028       652    376    63.424   63.9 +- 0.05 0.917    153
+  10_k_lambda_u 1037       665    372    64.127   63.9 +- 0.05 0.927    162
+  10_M_lambda_s 1.38404e+6 901655 482383 65.1467  63.9 +- 0.05 0.941426 335314
+  10_M_lambda_d 1.02408e+6 665862 358222 650203   63.9 +- 0.05 0.939598 180089
+  10_M_lambda_u
