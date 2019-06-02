@@ -435,9 +435,10 @@ int runKaonRecoEtc(string path, int pdgid) {
                             float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
                             float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second]; // pids beider spuren
 
-                            if ((TrackPID1 == -2212 && TrackPID2 == 211) || (TrackPID1 == 211 && TrackPID2 == -2212)) // wirft mir alle anti lambdas raus und plottet die separat
-                            {
+                            if ((TrackPID1 == -2212 && TrackPID2 == 211) || (TrackPID1 == 211 && TrackPID2 == -2212))
+                            { // wirft mir alle anti lambdas raus und plottet die separat
                                 histohelp->GetTH1D(histoHelper::hashAntiLambdas)->Fill(LInvMass_p_pi*1000); // fuelle ein histogramm mit den massen
+                                histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
                                 counter_antilambda += 1;
                                 continue;
                             }
@@ -527,8 +528,7 @@ int runKaonRecoEtc(string path, int pdgid) {
 memo an mich selbst: die spurpaare sind nach pt geordnet
 der hoehere pt wird meistens der protonspur zugeordnet, welche die spur ist,
 die an der stelle mit .first steht.
-das ist sehr unnatuerlich, da aus der rechnung mit viererimpulsen herauskommt,
-dass der impuls des pions immer groesser ist, als der des protons.
+siehe paper vorgehen.
 */
 
 // ---------------

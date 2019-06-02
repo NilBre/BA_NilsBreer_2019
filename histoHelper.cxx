@@ -86,14 +86,14 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("Charge", 2, -2., 2., "multplied charge (-1 or 1) of track_charge tuple", "No. multiplied track charges / bin", kZeroMax);
   NewTH1D("DeltaR_A", 25, 0., 2*M_PI, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("DeltaR_B", 25, 0., 2*M_PI, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
-  NewTH1D("LInvMass_true_p_pi", 15, 1100., 1150.,  "M(#Lambda) for T1(p), T2(#pi)", "No. of #Lambda / bin", kZeroMax);
-  NewTH1D("LInvMass_fake_p_pi", 15, 1100., 1150., "M(#Lambda) for T1(p), T2(#pi), fake candidates", "No. of #Lambda / bin", kZeroMax);
+  NewTH1D("LInvMass_true_p_pi", 50, 1105., 1125.,  "M(#Lambda) for T1(p), T2(#pi)", "No. of #Lambda / bin", kZeroMax);
+  NewTH1D("LInvMass_fake_p_pi", 50, 1105., 1125., "M(#Lambda) for T1(p), T2(#pi), fake candidates", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("LInvMass_true_pi_p", 15, 1200., 3000.,  "M(#Lambda) for T1(#pi), T2(p)", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("LInvMass_fake_pi_p", 15, 1200., 3000., "M(#Lambda) for T1(#pi), T2(p), fake caandidates", "No. of #Lambda / bin", kZeroMax);
-  NewTH1D("ArithMean", 30, 1000., 2000.,  "arithm mean of both candidates", "No. of #Lambda / bin", kZeroMax);
-  NewTH1D("GeoMean", 30, 1000., 2000., "geometrical mean of both candidates", "No. of #Lambda / bin", kZeroMax);
-  NewTH1D("Min", 30, 1000., 2000., "Minimum of both masses", "No. Tracks / bin", kZeroMax);
-  NewTH1D("AntiLambdas", 30, 1000., 2300., "No. of Anti-#Lambda ", "No. Tracks / bin", kZeroMax);
+  NewTH1D("ArithMean", 15, 1200., 2200.,  "arithm mean of both candidates", "No. of #Lambda / bin", kZeroMax);
+  NewTH1D("GeoMean", 15, 1200., 2200., "geometrical mean of both candidates", "No. of #Lambda / bin", kZeroMax);
+  NewTH1D("Min", 15, 1050., 1200., "Minimum of both masses", "No. Tracks / bin", kZeroMax);
+  NewTH1D("AntiLambdas", 15, 1000., 1300., "No. of Anti-#Lambda ", "No. Tracks / bin", kZeroMax);
    // the correct order is important here, because its implicitly used in retrieving the histograms from an instance
   v_TProfile = new vector<TProfile*>;
   //  NewTProfile("h_Jet2PartonMatch", 6, 0., 6., "bhad | blep | lq1 | lq2 | all | true found", "matching efficiency", kZeroOne);
