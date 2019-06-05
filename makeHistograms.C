@@ -121,8 +121,9 @@ int main() {
   draw(myFile1, myFile2, myFile3, "ArithMean", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "GeoMean", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "Min", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "AntiLambdas", "", "", "", legendentry1, legendentry2, legendentry3);
-
+  // draw(myFile1, myFile2, myFile3, "AntiLambdas", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "PTLambda_A", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "PTLambda_B", "", "", "", legendentry1, legendentry2, legendentry3);
   return 0;
 }
 
@@ -138,6 +139,7 @@ void drawBoth(TFile * f1, TFile * f2, TString histogramname1, TString histogramn
     TH1 * hist2 = (TH1*)f2->Get(histogramname1);
     TH1 * hist3 = (TH1*)f1->Get(histogramname2); // vorher: TH1 * hist3 = (TH1*)f1->Get("TruthNOtherKaons");
     TH1 * hist4 = (TH1*)f2->Get(histogramname2);
+    // evtl nehme ich die skalierung mal raus
   if (yaxislabel != "Efficiency"){
     hist1->Scale(1./(hist1->Integral()+hist1->GetBinContent(0)+hist1->GetBinContent(hist1->GetNbinsX()+1))); // add overflow and underflow bins
     hist2->Scale(1./(hist2->Integral()+hist2->GetBinContent(0)+hist2->GetBinContent(hist2->GetNbinsX()+1))); // add overflow and underflow bins
@@ -276,7 +278,7 @@ void draw(TFile * f1, TFile * f2, TFile * f3, TString histogramname,
   if (h3) l->AddEntry(h3, legendentry3, "l");
   l->SetFillColor(0);
   l->SetBorderSize(0);
-  l->SetTextSize(0.045);
+  l->SetTextSize(0.025);
 
   // draw on canvas and save
   TCanvas * c = new TCanvas("c", "c", 1);

@@ -74,8 +74,9 @@ class histoHelper {
     hashArithMean,
     hashGeoMean,
     hashMin,
-    hashAntiLambdas
-    // hashDeltaR_A_jet
+    // hashAntiLambdas,
+    hashPTLambda_A,
+    hashPTLambda_B
   };
 
   enum histoHashTProfile {

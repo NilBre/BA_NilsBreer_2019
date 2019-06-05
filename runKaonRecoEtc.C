@@ -12,6 +12,7 @@
 #include "TSystem.h"
 #include "THStack.h"
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -33,6 +34,7 @@ int runKaonRecoEtc(string path, int pdgid) {
   float jetDR = 0.5;
   // minimum track pT (used for tracks (and on truth level for pions))
   float minTrackPt = 0.1; // [GeV]
+  float minTrackPT_lambda = 0.5;
   float maxTrackEta = 20;
 
  //  float minTrackPt_Lambda = 0.5; // [GeV]
@@ -76,8 +78,13 @@ int runKaonRecoEtc(string path, int pdgid) {
   float counter_true = 0; // countet tracks, die als true reconstruiert werden
   float counter_fake = 0; // countet tracks, die als fake reconstruiert werden
   float counter_antilambda = 0; // counts anti lambda particles
+  float LMassAverage = 0; // mittlere lambda masse
+  float LMassError = 0; // fehler des mittelwerts auf die lambda masse
 
-  for (int iEntry(0); iEntry < nEntries; ++iEntry) {
+  // txt file for mean value of lambda mass
+
+  for (int iEntry(0); iEntry < nEntries; ++iEntry)
+  {
 
     // get entry no. iEntry and tell every 10000th event
     tree->GetEntry(iEntry);
@@ -141,29 +148,35 @@ int runKaonRecoEtc(string path, int pdgid) {
       if (vGenJet.DeltaR(vLambda) > jetDR) { // ereignisse ausserhalb des cones
           continue;
       }
-      if ((*tree->LambdaDaughter1_PID)[iLambda] != 2212 &&
-          (*tree->LambdaDaughter2_PID)[iLambda] != 211) // das sind protonen
-          {
-              countOtherLamb++;
-              countToOtherLambda += countOtherLamb;
-              continue;
-          }
-      nLambdasInTruth++;
-      counterToLambda += nLambdasInTruth;
+      // if ((*tree->LambdaDaughter1_PID)[iLambda] != 2212 &&
+      //     (*tree->LambdaDaughter2_PID)[iLambda] != 211) // das sind protonen
+      //     {
+      //         countOtherLamb++;
+      //         countToOtherLambda += countOtherLamb;
+      //         continue;
+      //     }
+      //     nLambdasInTruth++;
+      //     counterToLambda += nLambdasInTruth;
+      // hier nur wirkliche lambdas, keine antilambdas betrachten
+      if (((*tree->LambdaDaughter1_PID)[iLambda] == 2212 && (*tree->LambdaDaughter2_PID)[iLambda] == -211)
+      || ((*tree->LambdaDaughter1_PID)[iLambda] == -211 && (*tree->LambdaDaughter2_PID)[iLambda] == 2212)
+      || ((*tree->LambdaDaughter1_PID)[iLambda] == -2212 && (*tree->LambdaDaughter2_PID)[iLambda] == 211)
+      || ((*tree->LambdaDaughter1_PID)[iLambda] == 211 && (*tree->LambdaDaughter2_PID)[iLambda] == -2212)){
+          nLambdasInTruth++;
+          counterToLambda += nLambdasInTruth;
+      }
+      else{
+          countOtherLamb++;
+          countToOtherLambda += countOtherLamb;
+          continue;
+      }
 
       TLorentzVector vLDaughterP1 = lvhelp->getLambdaDaughterP1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
       TLorentzVector vLDaughterP2 = lvhelp->getLambdaDaughterP2TLV(iLambda);
       TLorentzVector vLDaughterPi1 = lvhelp->getLambdaDaughterPi1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
       TLorentzVector vLDaughterPi2 = lvhelp->getLambdaDaughterPi2TLV(iLambda);
-
-  //     if (vGenJet.DeltaR(vLDaughter1) < jetDR || vGenJet.DeltaR(vLDaughter2) < jetDR)
-  //     {
-  //       histohelp->GetTH1D(histoHelper::hashTruthProtonDeltaR)->Fill(vLDaughter1.DeltaR(vGenJet));
-  //       histohelp->GetTH1D(histoHelper::hashTruthPionDeltaR)->Fill(vLDaughter2.DeltaR(vGenJet));
-  //     }
   }
   histohelp->GetTH1D(histoHelper::hashTruthNlambdas)->Fill(nLambdasInTruth);
-  // histohelp->GetTH1D(histoHelper::hashTruthNlambdas)->Fill(countOtherLamb);
       // -----------------------------------
 
     // find all K_S that point to the truth jet (radius parameter R = jetDR) and decay to pi+ pi-
@@ -295,10 +308,9 @@ int runKaonRecoEtc(string path, int pdgid) {
       if (vJet.DeltaR(vTrack) > jetDR)
         continue;
 
-      // cout << " geordneter pt: " << vTrack.Pt() << " " << (*tree->Track_PID)[track_pt_idx[i_idx].first] << " " << (*tree->Track_PID)[track_pt_idx[i_idx].second] << endl;
       histohelp->GetTH1D(histoHelper::hashTrackPt_before_sel)->Fill(vTrack.Pt());
-      // if (vTrack.Pt() < minTrackPt)
-      //   continue;
+      if (vTrack.Pt() < minTrackPT_lambda)
+        continue;
 
       histohelp->GetTH1D(histoHelper::hashTrackEta_before_sel)->Fill(vTrack.Eta());
       if (fabs(vTrack.Eta()) > maxTrackEta)
@@ -435,13 +447,14 @@ int runKaonRecoEtc(string path, int pdgid) {
                             float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
                             float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second]; // pids beider spuren
 
-                            if ((TrackPID1 == -2212 && TrackPID2 == 211) || (TrackPID1 == 211 && TrackPID2 == -2212))
-                            { // wirft mir alle anti lambdas raus und plottet die separat
-                                histohelp->GetTH1D(histoHelper::hashAntiLambdas)->Fill(LInvMass_p_pi*1000); // fuelle ein histogramm mit den massen
-                                histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
-                                counter_antilambda += 1;
-                                continue;
-                            }
+                            // if ((TrackPID1 == -2212 && TrackPID2 == 211) || (TrackPID1 == 211 && TrackPID2 == -2212))
+                            // { // wirft mir alle anti lambdas raus und plottet die separat
+                            //     histohelp->GetTH1D(histoHelper::hashAntiLambdas)->Fill(LInvMass_p_pi*1000); // fuelle ein histogramm mit den massen
+                            //     histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
+                            //     counter_antilambda += 1;
+                            //     continue;
+                            // }
+                            // wirft alle pi+pi- paare raus->in die fakes
                             if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
                             {
                                 histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
@@ -459,10 +472,24 @@ int runKaonRecoEtc(string path, int pdgid) {
                                     histohelp->GetTH1D(histoHelper::hashMin)->Fill(LInvMass_pi_p*1000);
                                 }
                                 // fill histograms with arithmetischem mittel, geometrischem mittel, und normaler inv. mass
+                                float LambdaPtA = LambdaCandidate_A.Pt();
                                 histohelp->GetTH1D(histoHelper::hashArithMean)->Fill(arithm*1000);
                                 histohelp->GetTH1D(histoHelper::hashGeoMean)->Fill(geo*1000);
                                 histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
+                                // histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
+                                histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
                                 counter_true += 1;
+                                // mittelwert des lambdas und fehler des mittelwerts
+                                // LMassAverage += LInvMass_p_pi;
+                                if (pdgid == 3){
+                                    mittel1 << LInvMass_p_pi << endl;
+                                }
+                                if (pdgid == 1){
+                                    mittel2 << LInvMass_p_pi << endl;
+                                }
+                                if (pdgid == 2){
+                                    mittel3 << LInvMass_p_pi << endl;
+                                }
                             }
                             // schauen ob sie auch die korrekte masse haben
                             if (LInvMass_p_pi < minLambdaMass || LInvMass_p_pi > maxLambdaMass)
@@ -487,12 +514,12 @@ int runKaonRecoEtc(string path, int pdgid) {
                             if (LambdaCandidate_B.Pt() < 0.5){ // minimum candidate Pt von 500 MeV
                                 continue;
                             }
-                            if ((TrackPID3 == -2212 && TrackPID4 == 211) || (TrackPID3 == 211 && TrackPID4 == -2212))
-                            {
-                                histohelp->GetTH1D(histoHelper::hashAntiLambdas)->Fill(LInvMass_pi_p*1000);
-                                counter_antilambda += 1;
-                                continue;
-                            }
+                            // if ((TrackPID3 == -2212 && TrackPID4 == 211) || (TrackPID3 == 211 && TrackPID4 == -2212))
+                            // {
+                            //     histohelp->GetTH1D(histoHelper::hashAntiLambdas)->Fill(LInvMass_pi_p*1000);
+                            //     counter_antilambda += 1;
+                            //     continue;
+                            // }
                             if ((TrackPID3 == 211 && TrackPID4 == -211) || (TrackPID3 == -211 && TrackPID4 == 211))
                             {
                                 histohelp->GetTH1D(histoHelper::hashLInvMass_fake_pi_p)->Fill(LInvMass_pi_p*1000);
@@ -507,9 +534,12 @@ int runKaonRecoEtc(string path, int pdgid) {
                                 else{
                                     histohelp->GetTH1D(histoHelper::hashMin)->Fill(LInvMass_pi_p*1000);
                                 }
+                                float LambdaPtB = LambdaCandidate_B.Pt();
                                 histohelp->GetTH1D(histoHelper::hashArithMean)->Fill(arithm*1000);
                                 histohelp->GetTH1D(histoHelper::hashGeoMean)->Fill(geo*1000);
                                 histohelp->GetTH1D(histoHelper::hashLInvMass_true_pi_p)->Fill(LInvMass_pi_p*1000);
+                                // histohelp->GetTH1D(histoHelper::hashDeltaR_B)->Fill(dR_B);
+                                histohelp->GetTH1D(histoHelper::hashPTLambda_B)->Fill(LambdaPtB);
                                 counter_true += 1;
                             }
                         }
@@ -682,9 +712,12 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   cout << endl;
   cout << " reco-level-results: " << endl;
   cout << " true Λ: " << counter_true << endl;
-  cout << " true anti-Λ: " << counter_antilambda << endl;
   cout << " fake Λ: " << counter_fake << endl;
-  cout << " Λ / anti-Λ: " << counter_true/counter_antilambda << endl;
+  // cout << " true anti-Λ: " << counter_antilambda << endl;
+  // cout << " Λ / anti-Λ: " << counter_true/counter_antilambda << endl;
+  // cout << "Mittelwert der Λ Masse: " << LMassAverage / counter_true << endl;
+  // LMassError = sqrt((1/(n*(n-1))) * )
+
 
   // hier koennte ich noch gesamtzahlen von signal und fakes hinschreiben
   // oder auch anteil an  Λ / Λbar
@@ -695,7 +728,12 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
 }
 
 int main() {
-
+    ofstream mittel1;
+    mittel1.open("lambda_mittelwerte1.txt");
+    ofstream mittel2;
+    mittel2.open("lambda_mittelwerte2.txt");
+    ofstream mittel3;
+    mittel3.open("lambda_mittelwerte3.txt");
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
@@ -704,6 +742,9 @@ int main() {
   runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3);
   runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1);
   runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2);
+  mittel1.close();
+  mittel2.close();
+  mittel3.close();
   // end happily
   return 0;
 }
