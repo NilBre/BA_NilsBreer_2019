@@ -76,7 +76,8 @@ class histoHelper {
     hashMin,
     // hashAntiLambdas,
     hashPTLambda_A,
-    hashPTLambda_B
+    hashPTLambda_B,
+    hashXLambda
   };
 
   enum histoHashTProfile {

@@ -28,3 +28,6 @@ all : $(OBJ) $(EXE)
 
 clean :
 	@$(RM) $(GARBAGE)
+	rm lambda_mittelwerte1.txt
+	rm lambda_mittelwerte2.txt
+	rm lambda_mittelwerte3.txt

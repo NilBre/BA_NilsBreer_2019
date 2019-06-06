@@ -124,6 +124,7 @@ int main() {
   // draw(myFile1, myFile2, myFile3, "AntiLambdas", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "PTLambda_A", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "PTLambda_B", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "XLambda", "", "", "", legendentry1, legendentry2, legendentry3);
   return 0;
 }
 

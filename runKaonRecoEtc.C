@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -77,9 +77,7 @@ int runKaonRecoEtc(string path, int pdgid) {
   float LambdaTotalDecay = 0; // gesamtzahl an zerfaellen
   float counter_true = 0; // countet tracks, die als true reconstruiert werden
   float counter_fake = 0; // countet tracks, die als fake reconstruiert werden
-  float counter_antilambda = 0; // counts anti lambda particles
-  float LMassAverage = 0; // mittlere lambda masse
-  float LMassError = 0; // fehler des mittelwerts auf die lambda masse
+  // float counter_antilambda = 0; // counts anti lambda particles
 
   // txt file for mean value of lambda mass
 
@@ -434,6 +432,7 @@ int runKaonRecoEtc(string path, int pdgid) {
                     float geo = sqrt(LInvMass_p_pi * LInvMass_pi_p); // geometrisches mittel
                     float minimumMassPPi = abs(LInvMass_p_pi - pdgLambda); // differenz zwischen berechneter M_Inv und pdg Mass
                     float minimumMassPiP = abs(LInvMass_pi_p - pdgLambda); // same
+                    TLorentzVector LambdaJet = lvhelp->getJetTLV(i);
 
                     if (j == 0)
                     { // fuer Kandidat A: T1(proton mass), T2(pion pass)
@@ -473,22 +472,34 @@ int runKaonRecoEtc(string path, int pdgid) {
                                 }
                                 // fill histograms with arithmetischem mittel, geometrischem mittel, und normaler inv. mass
                                 float LambdaPtA = LambdaCandidate_A.Pt();
+                                float JetPtA = LambdaJet.Pt();
+                                float X_Lambda = LambdaPtA / JetPtA;
                                 histohelp->GetTH1D(histoHelper::hashArithMean)->Fill(arithm*1000);
                                 histohelp->GetTH1D(histoHelper::hashGeoMean)->Fill(geo*1000);
                                 histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
-                                // histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
+
+                                // diskriminanten: M, deltaR(jet, lambda), XLambda(pt quotient)
+                                // diskriminante M? -> nein
+                                // diskriminante deltaR? -> noch nicht. wahrscheinlich ist das ncith das richtige deltaR.
+                                // diskriminante XLambda? -> ja, sehr gut :)
+                                // diskriminante sqrt(vx^2 + vy^2)? noch nicht implementiert
+                                // taggereffizienz: setze cut auf pt irgendwo. bool ob drueber oder drunter
+                                // alles drueber ist signal rest background-> roc kurve 
+                                histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
                                 histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
+                                histohelp->GetTH1D(histoHelper::hashXLambda)->Fill(X_Lambda);
                                 counter_true += 1;
+
                                 // mittelwert des lambdas und fehler des mittelwerts
                                 // LMassAverage += LInvMass_p_pi;
                                 if (pdgid == 3){
-                                    mittel1 << LInvMass_p_pi << endl;
+                                    ifile << LInvMass_p_pi << endl;
                                 }
                                 if (pdgid == 1){
-                                    mittel2 << LInvMass_p_pi << endl;
+                                    ifile << LInvMass_p_pi << endl;
                                 }
                                 if (pdgid == 2){
-                                    mittel3 << LInvMass_p_pi << endl;
+                                    ifile << LInvMass_p_pi << endl;
                                 }
                             }
                             // schauen ob sie auch die korrekte masse haben
@@ -711,16 +722,16 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   // results for lambda reco algorithm
   cout << endl;
   cout << " reco-level-results: " << endl;
+  // es kann sein, dass die alle doppelt geyaehlt werden
   cout << " true Λ: " << counter_true << endl;
   cout << " fake Λ: " << counter_fake << endl;
   // cout << " true anti-Λ: " << counter_antilambda << endl;
   // cout << " Λ / anti-Λ: " << counter_true/counter_antilambda << endl;
-  // cout << "Mittelwert der Λ Masse: " << LMassAverage / counter_true << endl;
-  // LMassError = sqrt((1/(n*(n-1))) * )
+  cout << "------- python rechnungen ---------" << endl;
+  cout << "MIttelwerte /pm error, ssbar: "  << "(1116.09 +- 0.11) MeV" << endl;
+  cout << "MIttelwerte /pm error, ddbar: "  << "(1116.35 +- 0.24) MeV" << endl;
+  cout << "MIttelwerte /pm error, uubar: "  << "(1116.89 +- 0.39) MeV" << endl;
 
-
-  // hier koennte ich noch gesamtzahlen von signal und fakes hinschreiben
-  // oder auch anteil an  Λ / Λbar
 
 
   cout << "---------- End ---------" << endl;
@@ -739,9 +750,9 @@ int main() {
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3);
   mittel1.close();
   mittel2.close();
   mittel3.close();
