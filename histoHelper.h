@@ -77,8 +77,11 @@ class histoHelper {
     // hashAntiLambdas,
     hashPTLambda_A,
     hashPTLambda_B,
-    hashXLambda
-  };
+    hashXLambda,
+    hashDeltaR_A_fake,
+    hashPTLambda_A_fake,
+    hashXLambda_fake
+    };
 
   enum histoHashTProfile {
     hashJet2PartonMatch

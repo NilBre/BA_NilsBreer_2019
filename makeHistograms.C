@@ -125,6 +125,12 @@ int main() {
   draw(myFile1, myFile2, myFile3, "PTLambda_A", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "PTLambda_B", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "XLambda", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "DeltaR_A_fake", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "PTLambda_A_fake", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "XLambda_fake", "", "", "", legendentry1, legendentry2, legendentry3);
+  drawBoth(myFile1, myFile2, "DeltaR_A", "DeltaR_A_fake", "", "", "", legendentry1, legendentry2);
+  drawBoth(myFile1, myFile2, "PTLambda_A", "PTLambda_A_fake", "", "", "", legendentry1, legendentry2);
+  drawBoth(myFile1, myFile2, "XLambda", "XLambda_fake", "", "", "", legendentry1, legendentry2);
   return 0;
 }
 

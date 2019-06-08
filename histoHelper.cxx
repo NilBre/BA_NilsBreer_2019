@@ -97,6 +97,10 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("PTLambda_A", 50, 0., 40., "Lambda PT [GeV]", "No. Candidates / bin", kZeroMax);
   NewTH1D("PTLambda_B", 50, 0., 40., "Lambda PT [GeV]", "No. Candidates / bin", kZeroMax);
   NewTH1D("XLambda", 50, 0., 1., "X_#Lambda", "No. / bin", kZeroMax);
+  NewTH1D("DeltaR_A_fake", 50, -0.001, 0.003, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
+  NewTH1D("PTLambda_A_fake", 50, 0., 40., "Lambda PT, fakes [GeV]", "No. Candidates / bin", kZeroMax);
+  NewTH1D("XLambda_fake", 50, 0., 1., "X_#Lambda fakes", "No. / bin", kZeroMax);
+
    // the correct order is important here, because its implicitly used in retrieving the histograms from an instance
   v_TProfile = new vector<TProfile*>;
   //  NewTProfile("h_Jet2PartonMatch", 6, 0., 6., "bhad | blep | lq1 | lq2 | all | true found", "matching efficiency", kZeroOne);

@@ -6,6 +6,7 @@ from uncertainties import ufloat
 from uncertainties.unumpy import (nominal_values as noms, std_devs as stds)
 import uncertainties.unumpy as unp
 import scipy.constants as const
+import uproot
 
 mittelwerte_ssbar = np.genfromtxt("lambda_mittelwerte1.txt")
 mittelwerte_ddbar = np.genfromtxt("lambda_mittelwerte2.txt")
@@ -32,3 +33,8 @@ for i in range(3):
             summe += (mittel[i] - mittelwerte_uubar[k])**2
 
     print("Der Fehler des Mittelwertes: ", np.sqrt(factor*summe), " zum Mittelwert: ", mittel[i])
+
+# ab hier ROC kurven mit uproot
+# file_strange = uproot.open("../../data/ssbar-res-phi-corrected.root")
+# file_down = uproot.open("../../data/ddbar-res-phi-corrected.root")
+# file_up = uproot.open("../../data/uubar-res-phi-corrected.root")
