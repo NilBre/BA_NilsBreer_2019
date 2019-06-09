@@ -489,6 +489,41 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile) {
                                 histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
                                 histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
                                 histohelp->GetTH1D(histoHelper::hashXLambda)->Fill(X_Lambda);
+                                // ------------------
+// testrealm for BA
+float w = h1->GetBinWidth(0);
+// cout << "width: " << w << endl;
+float cut[] = {-2, -1, 0};
+float lowerborder1 = h1->GetBinLowEdge(0);
+for (int j = 0; j < 3; j++){
+    float dist = abs(lowerborder1 - cut[j]);
+    int N = dist / w;
+    float end = 100;
+    float tp = 0;
+    float fn = 0;
+    float fp = 0;
+    float tn = 0;
+    // left side
+    // cout << "for j = " << j << endl;
+    // cout << N << " " << end << " " << endl;
+    for (int k = 0; k < N; k++){
+        tn = tn + (abs(h1->GetBinContent(k) - h2->GetBinContent(k)));
+        fn = fn + (h2->GetBinContent(k));
+    }
+    // right side
+    for (int m = N; m < end; m++){
+        tp = tp + (abs(h2->GetBinContent(m) -  h1->GetBinContent(m)));
+        fp = fp + (h1->GetBinContent(m));
+    }
+    cout << "tp: " << tp << endl;
+    cout << "fp: " << fp << endl;
+    cout << "tn: " << tn << endl;
+    cout << "fn: " << fn << endl;
+    cout << "sensitivity: " << tp / (tp + fn) << endl;
+    cout << "specificity: " << 1 - (tn / (fp + tn)) << endl;
+}
+// ------------------
+
                                 // mittelwert des lambdas und fehler des mittelwerts
                                 // LMassAverage += LInvMass_p_pi;
                                 if (pdgid == 3){
