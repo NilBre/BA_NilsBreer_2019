@@ -428,17 +428,14 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                     TLorentzVector vLambda_Ref = lvhelp->getLambdaTLV(i); // lambda referenz
                     TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
                     TLorentzVector LambdaCandidate_B = vTrack3 + vTrack4;
-                    float dR_A = vLambda_Ref.DeltaR(LambdaCandidate_A); // deltaR zwischen lambda referenz und summenspur
-                    float dR_B = vLambda_Ref.DeltaR(LambdaCandidate_B);
+                    float dR_A = LambdaCandidate_A.DeltaR(vGenJet); // deltaR zwischen lambda referenz und summenspur
+                    float dR_B = LambdaCandidate_B.DeltaR(vGenJet);
                     float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
                     float LInvMass_pi_p = LambdaCandidate_B.M(); // T3 und T4
                     float arithm = (LInvMass_p_pi + LInvMass_pi_p)/2; // arithmetisches mittel
                     float geo = sqrt(LInvMass_p_pi * LInvMass_pi_p); // geometrisches mittel
                     float minimumMassPPi = abs(LInvMass_p_pi - pdgLambda); // differenz zwischen berechneter M_Inv und pdg Mass
                     float minimumMassPiP = abs(LInvMass_pi_p - pdgLambda); // same
-                    TLorentzVector LambdaJet = lvhelp->getJetTLV(iTrackPair);
-                    float DR = vGenJet.DeltaR(LambdaCandidate_A);
-                    // setze cut: fuer x_lambda
                     if (j == 0)
                     { // fuer Kandidat A: T1(proton mass), T2(pion pass)
                         histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
@@ -450,13 +447,6 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                             // bestimme die PIDs der spuren
                             float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
                             float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second]; // pids beider spuren
-                            // if ((TrackPID1 == -2212 && TrackPID2 == 211) || (TrackPID1 == 211 && TrackPID2 == -2212))
-                            // { // wirft mir alle anti lambdas raus und plottet die separat
-                            //     histohelp->GetTH1D(histoHelper::hashAntiLambdas)->Fill(LInvMass_p_pi*1000); // fuelle ein histogramm mit den massen
-                            //     histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
-                            //     counter_antilambda += 1;
-                            //     continue;
-                            // }
                             // wirft alle pi+pi- paare raus->in die fakes
                             if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
                             {
@@ -476,7 +466,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                                 }
                                 // fill histograms with arithmetischem mittel, geometrischem mittel, und normaler inv. mass
                                 float LambdaPtA = LambdaCandidate_A.Pt();
-                                float JetPtA = LambdaJet.Pt();
+                                float JetPtA = vJet.Pt();
                                 float X_Lambda = LambdaPtA / JetPtA;
                                 histohelp->GetTH1D(histoHelper::hashArithMean)->Fill(arithm*1000);
                                 histohelp->GetTH1D(histoHelper::hashGeoMean)->Fill(geo*1000);
@@ -492,8 +482,6 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                                 histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
                                 histohelp->GetTH1D(histoHelper::hashXLambda)->Fill(X_Lambda);
 
-                                // mittelwert des lambdas und fehler des mittelwerts
-                                // LMassAverage += LInvMass_p_pi;
                                 if (pdgid == 3){
                                     ifile1 << LInvMass_p_pi << endl;
                                 }
@@ -514,7 +502,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                         else // wenn deltaR > 0.5 -> fake teilchen
                         {
                             float LambdaPtA = LambdaCandidate_A.Pt();
-                            float JetPtA = LambdaJet.Pt();
+                            float JetPtA = vLambda_Ref.Pt();
                             float X_Lambda = LambdaPtA / JetPtA;
                             // fill histogram with invariant mass for this same candidate but result in lot for fakes
                             histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
@@ -683,31 +671,35 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   // ------------------
   float w = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
   // cout << "width: " << w << endl;
-  float cuts[7] = {0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
-  float lowerborder1 = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinLowEdge(0);
-  for (int j = 0; j < 7; j++){
+  float cuts[9] = {0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45};
+  float lowerborder1 = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinLowEdge(0);
+  for (int j = 0; j < 9; j++){
       float dist = abs(lowerborder1 - cuts[j]);
       int N = dist / w; // anzahl an schritten bis zum cut
-      float end = 50; // anzahl an bins des histogramms -> am besten fuer alle gleich!
-      float leftArea = 0;
-      float rightArea = 0;
-      cout << N << " " << dist << endl;
+      float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
+      float leftAreaXL = 0;
+      float rightAreaXL = 0;
+      float leftAreaDR = 0;
+      float rightAreaDR = 0;
+      // cout << N << " " << dist << endl;
       for (int k = 0; k < N; k++){
-          leftArea = leftArea + (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(k));
+          leftAreaDR += (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(k));
+          leftAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(k));
       }
       // right side
       for (int m = N; m < end; m++){
-          rightArea = rightArea + (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(m));
+          rightAreaDR += (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(m));
+          rightAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(m));
       }
       // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
       if (pdgid == 3){
-          ifile2 << j << "\t" << leftArea << "\t" << rightArea << endl;
+          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
       }
       if (pdgid == 1){
-          ifile2 << j << "\t" << leftArea << "\t" << rightArea << endl;
+          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
       }
       if (pdgid == 2){
-          ifile2 << j << "\t" << leftArea << "\t" << rightArea << endl;
+          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
       }
   }
 // ------------------
