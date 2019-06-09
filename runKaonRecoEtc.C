@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid, ofstream &ifile) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -78,10 +78,12 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile) {
   float counter_true = 0; // countet tracks, die als true reconstruiert werden
   float counter_fake = 0; // countet tracks, die als fake reconstruiert werden
   // fuer ROC kurve
-  float tp = 0;
-  float fp = 0;
-  float p = 0;
-  float n = 0;
+  // float leftArea = 0;
+  // float rightArea = 0;
+  // float tp = 0;
+  // float fp = 0;
+  // float tn = 0;
+  // float fn = 0;
 
   for (int iEntry(0); iEntry < nEntries; ++iEntry)
   {
@@ -435,8 +437,8 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile) {
                     float minimumMassPPi = abs(LInvMass_p_pi - pdgLambda); // differenz zwischen berechneter M_Inv und pdg Mass
                     float minimumMassPiP = abs(LInvMass_pi_p - pdgLambda); // same
                     TLorentzVector LambdaJet = lvhelp->getJetTLV(iTrackPair);
+                    float DR = vGenJet.DeltaR(LambdaCandidate_A);
                     // setze cut: fuer x_lambda
-                    float cuts[4] = {0.2, 0.4, 0.6, 0.8};
                     if (j == 0)
                     { // fuer Kandidat A: T1(proton mass), T2(pion pass)
                         histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
@@ -489,51 +491,17 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile) {
                                 histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
                                 histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
                                 histohelp->GetTH1D(histoHelper::hashXLambda)->Fill(X_Lambda);
-                                // ------------------
-// testrealm for BA
-float w = h1->GetBinWidth(0);
-// cout << "width: " << w << endl;
-float cut[] = {-2, -1, 0};
-float lowerborder1 = h1->GetBinLowEdge(0);
-for (int j = 0; j < 3; j++){
-    float dist = abs(lowerborder1 - cut[j]);
-    int N = dist / w;
-    float end = 100;
-    float tp = 0;
-    float fn = 0;
-    float fp = 0;
-    float tn = 0;
-    // left side
-    // cout << "for j = " << j << endl;
-    // cout << N << " " << end << " " << endl;
-    for (int k = 0; k < N; k++){
-        tn = tn + (abs(h1->GetBinContent(k) - h2->GetBinContent(k)));
-        fn = fn + (h2->GetBinContent(k));
-    }
-    // right side
-    for (int m = N; m < end; m++){
-        tp = tp + (abs(h2->GetBinContent(m) -  h1->GetBinContent(m)));
-        fp = fp + (h1->GetBinContent(m));
-    }
-    cout << "tp: " << tp << endl;
-    cout << "fp: " << fp << endl;
-    cout << "tn: " << tn << endl;
-    cout << "fn: " << fn << endl;
-    cout << "sensitivity: " << tp / (tp + fn) << endl;
-    cout << "specificity: " << 1 - (tn / (fp + tn)) << endl;
-}
-// ------------------
 
                                 // mittelwert des lambdas und fehler des mittelwerts
                                 // LMassAverage += LInvMass_p_pi;
                                 if (pdgid == 3){
-                                    ifile << LInvMass_p_pi << endl;
+                                    ifile1 << LInvMass_p_pi << endl;
                                 }
                                 if (pdgid == 1){
-                                    ifile << LInvMass_p_pi << endl;
+                                    ifile1 << LInvMass_p_pi << endl;
                                 }
                                 if (pdgid == 2){
-                                    ifile << LInvMass_p_pi << endl;
+                                    ifile1 << LInvMass_p_pi << endl;
                                 }
                                 counter_true += 1;
                             }
@@ -597,13 +565,6 @@ for (int j = 0; j < 3; j++){
             }
             LambdaCand.push_back(iTrackPair);
     }
-
-/*
-memo an mich selbst: die spurpaare sind nach pt geordnet
-der hoehere pt wird meistens der protonspur zugeordnet, welche die spur ist,
-die an der stelle mit .first steht.
-siehe paper vorgehen.
-*/
 
 // ---------------
 // for lambda:
@@ -718,19 +679,51 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   histohelp->finalize(histofilename);
 
   // ------------------
-  int width = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(0);
-  cout << width << endl;
+  // testrealm for BA
   // ------------------
-
+  float w = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
+  // cout << "width: " << w << endl;
+  float cuts[7] = {0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+  float lowerborder1 = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinLowEdge(0);
+  for (int j = 0; j < 7; j++){
+      float dist = abs(lowerborder1 - cuts[j]);
+      int N = dist / w; // anzahl an schritten bis zum cut
+      float end = 50; // anzahl an bins des histogramms -> am besten fuer alle gleich!
+      float leftArea = 0;
+      float rightArea = 0;
+      cout << N << " " << dist << endl;
+      for (int k = 0; k < N; k++){
+          leftArea = leftArea + (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(k));
+      }
+      // right side
+      for (int m = N; m < end; m++){
+          rightArea = rightArea + (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(m));
+      }
+      // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
+      if (pdgid == 3){
+          ifile2 << j << "\t" << leftArea << "\t" << rightArea << endl;
+      }
+      if (pdgid == 1){
+          ifile2 << j << "\t" << leftArea << "\t" << rightArea << endl;
+      }
+      if (pdgid == 2){
+          ifile2 << j << "\t" << leftArea << "\t" << rightArea << endl;
+      }
+  }
+// ------------------
 
   // clean up and end program happily
   delete lvhelp;
   delete histohelp;
 
   // ergebnisse
-  // fuer kaons
-  cout << " Truth-Level-Results " << endl;
-  cout << " ---------- Start --------- " << endl;
+  cout << "/////////////" << endl;
+  cout << "//  Start  //" << endl;
+  cout << "/////////////" << endl;
+  cout << endl;
+  cout << "///////////////////////////" << endl;
+  cout << "//  Truth-Level Results  //" << endl;
+  cout << "///////////////////////////" << endl;
   cout << " Kaons: " << endl;
   cout << " N(K_s -> π+π-) and point to truth jet: " << counterToPi << endl;
   cout << " N(other than π+π- final state): " << counterToOther << endl;
@@ -760,26 +753,31 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   cout << " abweichung[percent]: " << 100 - abweichung_lambda << endl;
   // results for lambda reco algorithm
   cout << endl;
-  cout << " reco-level-results: " << endl;
-  // es kann sein, dass die alle doppelt geyaehlt werden
+  cout << "//////////////////////////" << endl;
+  cout << "//  Reco-Level results  //" << endl;
+  cout << "//////////////////////////" << endl;
+  cout << endl;
+  // es kann sein, dass die alle doppelt gezaehlt werden
   cout << " true Λ: " << counter_true << endl;
   cout << " fake Λ: " << counter_fake << endl;
-  cout << " tp: " << tp << endl;
-  cout << " p: " << p << endl;
-  cout << " fp: " << fp << endl;
-  cout << " n: " << n << endl;
-  cout << " TPR: " << tp / p << endl;
-  cout << " FPR: " << fp / n << endl;
-  // cout << " true anti-Λ: " << counter_antilambda << endl;
-  // cout << " Λ / anti-Λ: " << counter_true/counter_antilambda << endl;
-  cout << "------- python rechnungen ---------" << endl;
+  cout << endl;
+  cout << "////////////////////" << endl;
+  cout << "//  ROC - Kurven  //" << endl;
+  cout << "////////////////////" << endl;
+  cout << endl;
+  cout << "siehe Python skript." << endl;
+  cout << endl;
+  cout << "/////////////////////////" << endl;
+  cout << "//  python rechnungen  //" << endl;
+  cout << "/////////////////////////" << endl;
+  cout << endl;
   cout << "MIttelwerte /pm error, ssbar: "  << "(1116.09 +- 0.11) MeV" << endl;
   cout << "MIttelwerte /pm error, ddbar: "  << "(1116.35 +- 0.24) MeV" << endl;
   cout << "MIttelwerte /pm error, uubar: "  << "(1116.89 +- 0.39) MeV" << endl;
-
-
-
-  cout << "---------- End ---------" << endl;
+  cout << endl;
+  cout << "///////////" << endl;
+  cout << "//  End  //" << endl;
+  cout << "///////////" << endl;
   return 0;
 }
 
@@ -790,17 +788,28 @@ int main() {
     mittel2.open("lambda_mittelwerte2.txt");
     ofstream mittel3;
     mittel3.open("lambda_mittelwerte3.txt");
+
+    // LR: left right ~ bezieht sich auf die flaechen
+    ofstream LRssbar;
+    LRssbar.open("ssbar_werte.txt");
+    ofstream LRddbar;
+    LRddbar.open("ddbar_werte.txt");
+    ofstream LRuubar;
+    LRuubar.open("uubar_werte.txt");
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, LRssbar);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, LRddbar);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, LRuubar);
   mittel1.close();
   mittel2.close();
   mittel3.close();
+  LRssbar.close();
+  LRddbar.close();
+  LRuubar.close();
   // end happily
   return 0;
 }

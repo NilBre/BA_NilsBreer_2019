@@ -31,3 +31,6 @@ clean :
 	rm lambda_mittelwerte1.txt
 	rm lambda_mittelwerte2.txt
 	rm lambda_mittelwerte3.txt
+	rm ssbar_werte.txt
+	rm ddbar_werte.txt
+	rm uubar_werte.txt
