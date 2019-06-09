@@ -9,9 +9,9 @@ j, aDR3, bDR3, ax3, bx3 = np.genfromtxt("uubar_werte.txt", unpack=True)
 
 # auswertung der roc daten
 # fuer deltaR:
-totalssbar_DR = aDR1 + bDR1
-totalddbar_DR = aDR2 + bDR2
-totaluubar_DR = aDR3 + bDR3
+totalssbar_DR = sum(aDR1) + sum(bDR1)
+totalddbar_DR = sum(aDR2) + sum(bDR2)
+totaluubar_DR = sum(aDR3) + sum(bDR3)
 # for ssbar - uubar comparison
 tp_ssuu = []
 fp_ssuu = []
@@ -34,15 +34,15 @@ spec2 = []
 # fill the right arrays:
 # calc all important variables
 for i in range(len(aDR1)):
-    tp_ssuu.append(bDR1[i])
-    fp_ssuu.append(bDR3[i])
-    tn_ssuu.append(aDR3[i])
-    fn_ssuu.append(aDR1[i])
+    tp_ssuu.append(bDR3[i])
+    fp_ssuu.append(bDR1[i])
+    tn_ssuu.append(aDR1[i])
+    fn_ssuu.append(aDR3[i])
 
 # fill FPR and TPR
 for i in range(len(aDR1)):
-    positiveRatio1.append(bDR1[i] / totalssbar_DR)
-    negativeRatio1.append(bDR3[i] / totaluubar_DR)
+    positiveRatio1.append(bDR3[i] / totaluubar_DR)
+    negativeRatio1.append(bDR1[i] / totalssbar_DR)
 
 # calc ROC with other way
 for i in range(len(aDR1)):
@@ -53,15 +53,15 @@ for i in range(len(aDR1)):
 
 # calc important values
 for i in range(len(aDR1)):
-    tp_ssdd.append(bDR1[i])
-    fp_ssdd.append(bDR2[i])
+    tp_ssdd.append(bDR2[i])
+    fp_ssdd.append(bDR1[i])
     tn_ssdd.append(aDR1[i])
-    fn_ssdd.append(aDR1[i])
+    fn_ssdd.append(aDR2[i])
 
 # fill FPR and TPR
 for i in range(len(aDR1)):
-    positiveRatio2.append(bDR1[i] / totalssbar_DR)
-    negativeRatio2.append(bDR2[i] / totalddbar_DR)
+    positiveRatio2.append(bDR2[i] / totalddbar_DR)
+    negativeRatio2.append(bDR1[i] / totalssbar_DR)
 
 # calc ROC with other way
 for i in range(len(aDR1)):
@@ -77,7 +77,7 @@ plt.grid()
 plt.legend()
 plt.xlabel("1 - specificity")
 plt.ylabel("sensitivity")
-plt.savefig("ROC_DeltaR.pdf")
+plt.savefig("py_output/ROC_DeltaR.pdf")
 plt.clf()
 
 plt.plot(negativeRatio1, positiveRatio1, "b--", label="alt. DR (s-u)")
@@ -85,14 +85,13 @@ plt.plot(negativeRatio2, positiveRatio2, "k--", label="alt. DR (s-d)")
 plt.plot([1,0], [1,0], "r-", label="random values")
 plt.grid()
 plt.legend()
-plt.savefig("ROC_DeltaR_alt.pdf")
+plt.savefig("py_output/ROC_DeltaR_alt.pdf")
 plt.clf()
 
 # fuer XLambda
-totalssbar_XL = ax1 + bx1
-totalddbar_XL = ax2 + bx2
-totaluubar_XL = ax3 + bx3
-
+totalssbar_XL = sum(ax1) + sum(bx1)
+totalddbar_XL = sum(ax2) + sum(bx2)
+totaluubar_XL = sum(ax3) + sum(bx3)
 # for ssbar - uubar comparison
 tp_su_x = []
 fp_su_x = []
@@ -127,10 +126,10 @@ for i in range(len(ax1)):
 
 # calc ROC with other way
 for i in range(len(ax1)):
-    calc_sens1 = tp_su_x[i] / (tp_su_x[i] + fn_su_x[i])
-    calc_spec1 = 1 - (tn_su_x[i] / (fp_su_x[i] + tn_su_x[i]))
-    SE1.append(calc_sens1)
-    SP1.append(calc_spec1)
+    sensXL1 = tp_su_x[i] / (tp_su_x[i] + fn_su_x[i])
+    specXL1 = 1 - (tn_su_x[i] / (fp_su_x[i] + tn_su_x[i]))
+    SE1.append(sensXL1)
+    SP1.append(specXL1)
 
 # calc important values
 for i in range(len(ax1)):
@@ -146,10 +145,10 @@ for i in range(len(ax1)):
 
 # calc ROC with other way
 for i in range(len(aDR1)):
-    calc_sens2 = tp_ssdd[i] / (tp_ssdd[i] + fn_ssdd[i])
-    calc_spec2 = 1 - (tn_ssdd[i] / (fp_ssdd[i] + tn_ssdd[i]))
-    SE2.append(calc_sens2)
-    SP2.append(calc_spec2)
+    sensXL2 = tp_ssdd[i] / (tp_ssdd[i] + fn_ssdd[i])
+    specXL2 = 1 - (tn_ssdd[i] / (fp_ssdd[i] + tn_ssdd[i]))
+    SE2.append(sensXL2)
+    SP2.append(specXL2)
 
 plt.plot(SP1, SE1, "b--", label="roc punkte XLambda (s-u)")
 plt.plot(SP2, SE2, "k--", label="roc punkte XLambda (s-d)")
@@ -158,7 +157,7 @@ plt.grid()
 plt.legend()
 plt.xlabel("1 - specificity")
 plt.ylabel("sensitivity")
-plt.savefig("ROC_XLambda.pdf")
+plt.savefig("py_output/ROC_XLambda.pdf")
 plt.clf()
 
 plt.plot(nr1, pr1, "b--", label="alt. XLambda (s-u)")
@@ -166,5 +165,5 @@ plt.plot(nr2, pr2, "k--", label="alt. XLambda (s-d)")
 plt.plot([1,0], [1,0], "r-", label="random values")
 plt.grid()
 plt.legend()
-plt.savefig("ROC_XLambda_alt.pdf")
+plt.savefig("py_output/ROC_XLambda_alt.pdf")
 plt.clf()
