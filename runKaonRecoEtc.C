@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -422,14 +422,14 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                 for (int j = 0; j < 2; j++)
                 {
                     TLorentzVector vTrack1 = lvhelp->getTrackTLV(trackPairs[iTrackPair].first, LorentzVectorHelper::kProtonMass);
-                    TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
+                    TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[i].second, LorentzVectorHelper::kPionMass); // vorher: trackPairs[iTrackPair].second !!
                     TLorentzVector vTrack3 = lvhelp->getTrackTLV(trackPairs[iTrackPair].first, LorentzVectorHelper::kPionMass);
                     TLorentzVector vTrack4 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kProtonMass);
                     TLorentzVector vLambda_Ref = lvhelp->getLambdaTLV(i); // lambda referenz
                     TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
                     TLorentzVector LambdaCandidate_B = vTrack3 + vTrack4;
-                    float dR_A = LambdaCandidate_A.DeltaR(vGenJet); // deltaR zwischen lambda referenz und summenspur
-                    float dR_B = LambdaCandidate_B.DeltaR(vGenJet);
+                    float dR_A = LambdaCandidate_A.DeltaR(vJet); // deltaR zwischen lambda referenz und summenspur
+                    float dR_B = LambdaCandidate_B.DeltaR(vJet);
                     float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
                     float LInvMass_pi_p = LambdaCandidate_B.M(); // T3 und T4
                     float arithm = (LInvMass_p_pi + LInvMass_pi_p)/2; // arithmetisches mittel
@@ -446,7 +446,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                             }
                             // bestimme die PIDs der spuren
                             float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
-                            float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second]; // pids beider spuren
+                            float TrackPID2 = (*tree->Track_PID)[trackPairs[i].second]; // vorher: trackPairs[iTrackPair] !!
                             // wirft alle pi+pi- paare raus->in die fakes
                             if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
                             {
@@ -468,6 +468,12 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
                                 float LambdaPtA = LambdaCandidate_A.Pt();
                                 float JetPtA = vJet.Pt();
                                 float X_Lambda = LambdaPtA / JetPtA;
+                                // vertexpositionen x, y:
+                                float Vx1 = (*tree->Track_X)[trackPairs[i].first];
+                                float Vy1 = (*tree->Track_Y)[trackPairs[i].second];
+                                float d1 = sqrt(Vx1*Vx1 + Vy1*Vy1);
+                                histohelp->GetTH1D(histoHelper::hashabsvertex1)->Fill(d1);
+
                                 histohelp->GetTH1D(histoHelper::hashArithMean)->Fill(arithm*1000);
                                 histohelp->GetTH1D(histoHelper::hashGeoMean)->Fill(geo*1000);
                                 histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
@@ -671,37 +677,62 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   // ------------------
   float w = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
   // cout << "width: " << w << endl;
-  float cuts[9] = {0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45};
+  // man muss von rechts nach links schieben!!
   float lowerborder1 = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinLowEdge(0);
-  for (int j = 0; j < 9; j++){
-      float dist = abs(lowerborder1 - cuts[j]);
-      int N = dist / w; // anzahl an schritten bis zum cut
+  float cutsDR[10] = {0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05};
+  for (int j = 0; j < 10; j++){
+      float distDR = abs(lowerborder1 - cutsDR[j]);
+      int Ndr = distDR / w; // anzahl an schritten bis zum cut
       float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
-      float leftAreaXL = 0;
-      float rightAreaXL = 0;
       float leftAreaDR = 0;
       float rightAreaDR = 0;
       // cout << N << " " << dist << endl;
-      for (int k = 0; k < N; k++){
+      for (int k = 0; k < Ndr; k++){
           leftAreaDR += (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(k));
-          leftAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(k));
       }
       // right side
-      for (int m = N; m < end; m++){
+      for (int m = Ndr; m < end; m++){
           rightAreaDR += (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(m));
-          rightAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(m));
       }
       // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
       if (pdgid == 3){
-          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
+          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << endl;
       }
       if (pdgid == 1){
-          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
+          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << endl;
       }
       if (pdgid == 2){
-          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
+          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << endl;
       }
   }
+
+  float cutsXL[20] = {1., 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05};
+  for (int j = 0; j < 20; j++){
+      float distXL = abs(lowerborder1 - cutsXL[j]);
+      int Nxl = distXL / w;
+      float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
+      float leftAreaXL = 0;
+      float rightAreaXL = 0;
+
+      for (int a = 0; a < Nxl; a++){
+          leftAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(a));
+      }
+      for (int b = Nxl; b < end; b++){
+          rightAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(b));
+      }
+      // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
+      if (pdgid == 3){
+          ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
+      }
+      if (pdgid == 1){
+          ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
+      }
+      if (pdgid == 2){
+          ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
+      }
+
+  }
+
 // ------------------
 
   // clean up and end program happily
@@ -782,26 +813,38 @@ int main() {
     mittel3.open("lambda_mittelwerte3.txt");
 
     // LR: left right ~ bezieht sich auf die flaechen
+    // for DeltaR
     ofstream LRssbar;
     LRssbar.open("ssbar_werte.txt");
     ofstream LRddbar;
     LRddbar.open("ddbar_werte.txt");
     ofstream LRuubar;
     LRuubar.open("uubar_werte.txt");
+
+    // for XLambda
+    ofstream XLss;
+    XLss.open("ssbar_werte_XL.txt");
+    ofstream XLdd;
+    XLdd.open("ddbar_werte_XL.txt");
+    ofstream XLuu;
+    XLuu.open("uubar_werte_XL.txt");
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, LRssbar);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, LRddbar);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, LRuubar);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, LRssbar, XLss);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, LRddbar, XLdd);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, LRuubar, XLuu);
   mittel1.close();
   mittel2.close();
   mittel3.close();
   LRssbar.close();
   LRddbar.close();
   LRuubar.close();
+  XLss.close();
+  XLdd.close();
+  XLuu.close();
   // end happily
   return 0;
 }

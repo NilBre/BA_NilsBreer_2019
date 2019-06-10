@@ -34,3 +34,6 @@ clean :
 	rm ssbar_werte.txt
 	rm ddbar_werte.txt
 	rm uubar_werte.txt
+	rm ssbar_werte_XL.txt
+	rm ddbar_werte_XL.txt
+	rm uubar_werte_XL.txt

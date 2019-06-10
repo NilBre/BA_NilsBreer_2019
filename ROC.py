@@ -1,17 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
+# Notizen an mich:
+# Die alternative version ueber TPR und FPR geht bei beiden gut
+# warum die andere nicht
 
 # datenfiles fuer ROC Kurven
 # a: links vom cut, b: rechts vom cut
-j, aDR1, bDR1, ax1, bx1 = np.genfromtxt("ssbar_werte.txt", unpack=True)
-j, aDR2, bDR2, ax2, bx2 = np.genfromtxt("ddbar_werte.txt", unpack=True)
-j, aDR3, bDR3, ax3, bx3 = np.genfromtxt("uubar_werte.txt", unpack=True)
+j, aDR1, bDR1 = np.genfromtxt("ssbar_werte.txt", unpack=True)
+j, aDR2, bDR2 = np.genfromtxt("ddbar_werte.txt", unpack=True)
+j, aDR3, bDR3 = np.genfromtxt("uubar_werte.txt", unpack=True)
 
 # auswertung der roc daten
 # fuer deltaR:
-totalssbar_DR = sum(aDR1) + sum(bDR1)
-totalddbar_DR = sum(aDR2) + sum(bDR2)
-totaluubar_DR = sum(aDR3) + sum(bDR3)
+totalssbar_DR = aDR1[0] + bDR1[0]
+totalddbar_DR = aDR2[0] + bDR2[0]
+totaluubar_DR = aDR3[0] + bDR3[0]
 # for ssbar - uubar comparison
 tp_ssuu = []
 fp_ssuu = []
@@ -34,15 +37,15 @@ spec2 = []
 # fill the right arrays:
 # calc all important variables
 for i in range(len(aDR1)):
-    tp_ssuu.append(bDR3[i])
-    fp_ssuu.append(bDR1[i])
-    tn_ssuu.append(aDR1[i])
-    fn_ssuu.append(aDR3[i])
+    tp_ssuu.append(bDR1[i])
+    fp_ssuu.append(bDR3[i])
+    tn_ssuu.append(aDR3[i])
+    fn_ssuu.append(aDR1[i])
 
 # fill FPR and TPR
 for i in range(len(aDR1)):
-    positiveRatio1.append(bDR3[i] / totaluubar_DR)
-    negativeRatio1.append(bDR1[i] / totalssbar_DR)
+    positiveRatio1.append(bDR3[i] / totaluubar_DR) # TPR
+    negativeRatio1.append(bDR1[i] / totalssbar_DR) # FPR
 
 # calc ROC with other way
 for i in range(len(aDR1)):
@@ -51,17 +54,16 @@ for i in range(len(aDR1)):
     sens1.append(calc_sens1)
     spec1.append(calc_spec1)
 
-# calc important values
 for i in range(len(aDR1)):
-    tp_ssdd.append(bDR2[i])
-    fp_ssdd.append(bDR1[i])
-    tn_ssdd.append(aDR1[i])
-    fn_ssdd.append(aDR2[i])
+    tp_ssdd.append(bDR1[i])
+    fp_ssdd.append(bDR2[i])
+    tn_ssdd.append(aDR2[i])
+    fn_ssdd.append(aDR1[i])
 
 # fill FPR and TPR
 for i in range(len(aDR1)):
-    positiveRatio2.append(bDR2[i] / totalddbar_DR)
-    negativeRatio2.append(bDR1[i] / totalssbar_DR)
+    positiveRatio2.append(bDR2[i] / totalddbar_DR) # TPR
+    negativeRatio2.append(bDR1[i] / totalssbar_DR) # FPR
 
 # calc ROC with other way
 for i in range(len(aDR1)):
@@ -70,6 +72,8 @@ for i in range(len(aDR1)):
     sens2.append(calc_sens2)
     spec2.append(calc_spec2)
 
+print(sens2)
+print(spec2)
 plt.plot(spec1, sens1, "b--", label="roc punkte DR (s-u)")
 plt.plot(spec2, sens2, "k--", label="roc punkte DR (s-d)")
 plt.plot([1,0], [1,0], "r-", label="random values")
@@ -89,9 +93,13 @@ plt.savefig("py_output/ROC_DeltaR_alt.pdf")
 plt.clf()
 
 # fuer XLambda
-totalssbar_XL = sum(ax1) + sum(bx1)
-totalddbar_XL = sum(ax2) + sum(bx2)
-totaluubar_XL = sum(ax3) + sum(bx3)
+j, ax1, bx1 = np.genfromtxt("ssbar_werte_XL.txt", unpack=True)
+j, ax2, bx2 = np.genfromtxt("ddbar_werte_XL.txt", unpack=True)
+j, ax3, bx3 = np.genfromtxt("uubar_werte_XL.txt", unpack=True)
+
+totalssbar_XL = ax1[0] + bx1[0]
+totalddbar_XL = ax2[0] + bx2[0]
+totaluubar_XL = ax3[0] + bx3[0]
 # for ssbar - uubar comparison
 tp_su_x = []
 fp_su_x = []
@@ -113,6 +121,26 @@ SP2 = []
 
 # fill the right arrays:
 # calc all important variables
+
+# calc important values
+for i in range(len(ax1)):
+    tp_sd_x.append(bx1[i])
+    fp_sd_x.append(bx2[i])
+    tn_sd_x.append(ax2[i])
+    fn_sd_x.append(ax1[i])
+
+# fill FPR and TPR
+for i in range(len(ax1)):
+    pr1.append(bx1[i] / totalssbar_XL)
+    nr1.append(bx2[i] / totalddbar_XL)
+
+# calc ROC with other way
+for i in range(len(ax1)):
+    sensXL1 = tp_sd_x[i] / (tp_sd_x[i] + fn_sd_x[i])
+    specXL1 = 1 - (tn_sd_x[i] / (fp_sd_x[i] + tn_sd_x[i]))
+    SE1.append(sensXL1)
+    SP1.append(specXL1)
+
 for i in range(len(ax1)):
     tp_su_x.append(bx1[i])
     fp_su_x.append(bx3[i])
@@ -121,32 +149,13 @@ for i in range(len(ax1)):
 
 # fill FPR and TPR
 for i in range(len(ax1)):
-    pr1.append(bx1[i] / totalssbar_XL)
-    nr1.append(bx3[i] / totaluubar_XL)
-
-# calc ROC with other way
-for i in range(len(ax1)):
-    sensXL1 = tp_su_x[i] / (tp_su_x[i] + fn_su_x[i])
-    specXL1 = 1 - (tn_su_x[i] / (fp_su_x[i] + tn_su_x[i]))
-    SE1.append(sensXL1)
-    SP1.append(specXL1)
-
-# calc important values
-for i in range(len(ax1)):
-    tp_sd_x.append(bx1[i])
-    fp_sd_x.append(bx2[i])
-    tn_sd_x.append(ax1[i])
-    fn_sd_x.append(ax1[i])
-
-# fill FPR and TPR
-for i in range(len(ax1)):
     pr2.append(bx1[i] / totalssbar_XL)
-    nr2.append(bx2[i] / totalddbar_XL)
+    nr2.append(bx3[i] / totaluubar_XL)
 
 # calc ROC with other way
-for i in range(len(aDR1)):
-    sensXL2 = tp_ssdd[i] / (tp_ssdd[i] + fn_ssdd[i])
-    specXL2 = 1 - (tn_ssdd[i] / (fp_ssdd[i] + tn_ssdd[i]))
+for i in range(len(ax1)):
+    sensXL2 = tp_su_x[i] / (tp_su_x[i] + fn_su_x[i])
+    specXL2 = 1 - (tn_su_x[i] / (fp_su_x[i] + tn_su_x[i]))
     SE2.append(sensXL2)
     SP2.append(specXL2)
 

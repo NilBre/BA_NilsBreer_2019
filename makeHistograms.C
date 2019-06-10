@@ -131,6 +131,7 @@ int main() {
   drawBoth(myFile1, myFile2, "DeltaR_A", "DeltaR_A_fake", "", "", "", legendentry1, legendentry2);
   drawBoth(myFile1, myFile2, "PTLambda_A", "PTLambda_A_fake", "", "", "", legendentry1, legendentry2);
   drawBoth(myFile1, myFile2, "XLambda", "XLambda_fake", "", "", "", legendentry1, legendentry2);
+  draw(myFile1, myFile2, myFile3, "absvertex1", "", "", "", legendentry1, legendentry2, legendentry3);
   return 0;
 }
 

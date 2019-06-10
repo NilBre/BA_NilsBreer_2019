@@ -100,7 +100,7 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("DeltaR_A_fake", 75, 0., 0.6, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("PTLambda_A_fake", 75, 0., 40., "Lambda PT, fakes [GeV]", "No. Candidates / bin", kZeroMax);
   NewTH1D("XLambda_fake", 75, 0., 1., "X_#Lambda fakes", "No. / bin", kZeroMax);
-
+  NewTH1D("absvertex1", 75, 0., 100., "sqrt(vx^2 + vy^2)", "No. / bin", kZeroMax);
    // the correct order is important here, because its implicitly used in retrieving the histograms from an instance
   v_TProfile = new vector<TProfile*>;
   //  NewTProfile("h_Jet2PartonMatch", 6, 0., 6., "bhad | blep | lq1 | lq2 | all | true found", "matching efficiency", kZeroOne);
