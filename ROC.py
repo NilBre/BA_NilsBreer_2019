@@ -72,8 +72,6 @@ for i in range(len(aDR1)):
     sens2.append(calc_sens2)
     spec2.append(calc_spec2)
 
-print(sens2)
-print(spec2)
 plt.plot(spec1, sens1, "b--", label="roc punkte DR (s-u)")
 plt.plot(spec2, sens2, "k--", label="roc punkte DR (s-d)")
 plt.plot([1,0], [1,0], "r-", label="random values")

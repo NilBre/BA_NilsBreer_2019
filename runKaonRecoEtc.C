@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3, ofstream &ifile4) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -675,14 +675,16 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   // ------------------
   // testrealm for BA
   // ------------------
-  float w = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
+  float wxl = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
+  float wdr = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinWidth(0);
+  float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
   // cout << "width: " << w << endl;
   // man muss von rechts nach links schieben!!
   float lowerborder1 = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinLowEdge(0);
   float cutsDR[10] = {0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05};
   for (int j = 0; j < 10; j++){
       float distDR = abs(lowerborder1 - cutsDR[j]);
-      int Ndr = distDR / w; // anzahl an schritten bis zum cut
+      int Ndr = distDR / wdr; // anzahl an schritten bis zum cut
       float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
       float leftAreaDR = 0;
       float rightAreaDR = 0;
@@ -709,7 +711,7 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   float cutsXL[20] = {1., 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05};
   for (int j = 0; j < 20; j++){
       float distXL = abs(lowerborder1 - cutsXL[j]);
-      int Nxl = distXL / w;
+      int Nxl = distXL / wxl;
       float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
       float leftAreaXL = 0;
       float rightAreaXL = 0;
@@ -730,9 +732,32 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
       if (pdgid == 2){
           ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << endl;
       }
-
   }
-
+  float lbordervv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinLowEdge(0);
+  float cutsvxvy[29] = {100., 90., 80., 70., 60., 50., 40., 30., 20., 19., 18., 17., 16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1., 0.};
+  for (int j = 0; j < 29; j++){
+      float distvv = abs(lbordervv - cutsvxvy[j]);
+      int N = distvv / wvv;
+      float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
+      float leftAreavv = 0;
+      float rightAreavv = 0;
+      for (int a = 0; a < N; a++){
+          leftAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(a));
+      }
+      for (int b = N; b < end; b++){
+          rightAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(b));
+      }
+      // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
+      if (pdgid == 3){
+          ifile4 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+      }
+      if (pdgid == 1){
+          ifile4 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+      }
+      if (pdgid == 2){
+          ifile4 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+      }
+  }
 // ------------------
 
   // clean up and end program happily
@@ -828,14 +853,21 @@ int main() {
     XLdd.open("ddbar_werte_XL.txt");
     ofstream XLuu;
     XLuu.open("uubar_werte_XL.txt");
+
+    ofstream vvss;
+    vvss.open("ssbar_vxvy.txt");
+    ofstream vvdd;
+    vvdd.open("ddbar_vxvy.txt");
+    ofstream vvuu;
+    vvuu.open("uubar_vxvy.txt");
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, LRssbar, XLss);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, LRddbar, XLdd);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, LRuubar, XLuu);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, LRssbar, XLss, vvss);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, LRddbar, XLdd, vvdd);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, LRuubar, XLuu, vvuu);
   mittel1.close();
   mittel2.close();
   mittel3.close();
@@ -845,6 +877,9 @@ int main() {
   XLss.close();
   XLdd.close();
   XLuu.close();
+  vvss.close();
+  vvdd.close();
+  vvuu.close();
   // end happily
   return 0;
 }
