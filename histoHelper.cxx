@@ -79,12 +79,12 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("KaonDeltaR", 50, 0., 2*M_PI, "#Delta_R", "No. of Kaons / bin", kZeroMax);
   NewTH1D("LambdaInvMass", 50, 1000., 1400., "Invariant Lambda Mass [MeV]", "No. of Lambda / bin", kZeroMax);
   NewTH1D("LambdaPT", 50., 0., 100., "Lambda transverse momentum[GeV]", "No. of Lambda / bin", kZeroMax);
-  NewTH1D("LambdaXk", 50, 0., M_PI, "pT(Lambda)/pT(Jet)", "No. of Jets / bin", kZeroMax);
+  NewTH1D("LambdaXk", 50, 0., 1., "pT(Lambda)/pT(Jet)", "No. of Jets / bin", kZeroMax);
   NewTH1D("LambdaDeltaR", 50, 0., 1, " #Delta_R", "No. of Lambda / bin", kZeroMax);
   NewTH1D("JetPTforKaon", 50, 0., 90., " #Pt [GeV]", "No. of kaons / bin", kZeroMax);
   NewTH1D("TruthNOtherKaons", 6, 0., 6., "No. of K_s", "No. of kaons / bin", kZeroMax);
   NewTH1D("Charge", 5, -2., 2., "multplied charge (-1 or 1) of track_charge tuple", "No. multiplied track charges / bin", kZeroMax);
-  NewTH1D("DeltaR_A", 75, 0., 1., "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_A", 75, 0., 2*M_PI, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("DeltaR_B", 75, 0., 0.6, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("LInvMass_true_p_pi", 75, 1070., 1500.,  "M(#Lambda) for T1(p), T2(#pi)", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("LInvMass_fake_p_pi", 75, 1070., 1500., "M(#Lambda) for T1(p), T2(#pi), fake candidates", "No. of #Lambda / bin", kZeroMax);
