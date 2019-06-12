@@ -111,19 +111,10 @@ int main() {
   drawBoth(myFile1, myFile2, "TruthNKaons", "TruthNOtherKaons", "", "", "", legendentry1, legendentry2);
   draw(myFile1, myFile2, myFile3, "Charge", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "DeltaR_A", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "DeltaR_B", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "LInvMass_true_p_pi", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "LInvMass_fake_p_pi", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "LInvMass_true_pi_p", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "LInvMass_fake_pi_p", "", "", "", legendentry1, legendentry2, legendentry3);
   drawBoth(myFile1, myFile2, "LInvMass_true_p_pi", "LInvMass_fake_p_pi", "", "", "", legendentry1, legendentry2);
-  drawBoth(myFile1, myFile2, "LInvMass_true_pi_p", "LInvMass_fake_pi_p", "", "", "", legendentry1, legendentry2);
-  draw(myFile1, myFile2, myFile3, "ArithMean", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "GeoMean", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "Min", "", "", "", legendentry1, legendentry2, legendentry3);
-  // draw(myFile1, myFile2, myFile3, "AntiLambdas", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "PTLambda_A", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "PTLambda_B", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "XLambda", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "DeltaR_A_fake", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "PTLambda_A_fake", "", "", "", legendentry1, legendentry2, legendentry3);
@@ -132,6 +123,7 @@ int main() {
   drawBoth(myFile1, myFile2, "PTLambda_A", "PTLambda_A_fake", "", "", "", legendentry1, legendentry2);
   drawBoth(myFile1, myFile2, "XLambda", "XLambda_fake", "", "", "", legendentry1, legendentry2);
   draw(myFile1, myFile2, myFile3, "absvertex1", "", "", "", legendentry1, legendentry2, legendentry3);
+  draw(myFile1, myFile2, myFile3, "jetPTL", "", "", "", legendentry1, legendentry2, legendentry3);
   return 0;
 }
 

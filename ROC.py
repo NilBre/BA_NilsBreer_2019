@@ -1,5 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
+# from sklearn import metrics
+# from sklearn.metrics import roc_curve
+
 # Notizen an mich:
 # Die alternative version ueber TPR und FPR geht bei beiden gut
 # warum die andere nicht
@@ -91,46 +94,38 @@ plt.savefig("py_output/ROC_DeltaR_alt.pdf")
 plt.clf()
 
 # fuer XLambda
-j, ax1, bx1 = np.genfromtxt("ssbar_werte_XL.txt", unpack=True)
-j, ax2, bx2 = np.genfromtxt("ddbar_werte_XL.txt", unpack=True)
-j, ax3, bx3 = np.genfromtxt("uubar_werte_XL.txt", unpack=True)
+j, ax1, bx1, a_fake1, b_fake1 = np.genfromtxt("ssbar_werte_XL.txt", unpack=True)
+j, ax2, bx2, a_fake2, b_fake2 = np.genfromtxt("ddbar_werte_XL.txt", unpack=True)
+j, ax3, bx3, a_fake3, b_fake3 = np.genfromtxt("uubar_werte_XL.txt", unpack=True)
+
+# y = np.array([1, 1, 2, 2])
+# scores = np.array([0.1, 0.4, 0.35, 0.8])
+# fpr, tpr, thresholds = roc_curve(y, scores, pos_label=2)
 
 totalssbar_XL = ax1[0] + bx1[0]
 totalddbar_XL = ax2[0] + bx2[0]
 totaluubar_XL = ax3[0] + bx3[0]
-# for ssbar - uubar comparison
-tp_su_x = []
-fp_su_x = []
-tn_su_x = []
-fn_su_x = []
-pr1 = [] # TPR
-nr1 = [] # FPR
-SE1 = [] # sensitivity
-SP1 = [] # specificity
-# for ssbar - ddbar comparison
+# for ssbar
 tp_sd_x = []
 fp_sd_x = []
 tn_sd_x = []
 fn_sd_x = []
-pr2 = []
-nr2 = []
-SE2 = []
-SP2 = []
-
-# fill the right arrays:
-# calc all important variables
+pr1 = []
+nr1 = []
+SE1 = []
+SP1 = []
 
 # calc important values
 for i in range(len(ax1)):
+    fp_sd_x.append(b_fake1[i])
     tp_sd_x.append(bx1[i])
-    fp_sd_x.append(bx2[i])
-    tn_sd_x.append(ax2[i])
     fn_sd_x.append(ax1[i])
+    tn_sd_x.append(a_fake1[i])
 
 # fill FPR and TPR
 for i in range(len(ax1)):
+    nr1.append(b_fake1[i] / totalssbar_XL)
     pr1.append(bx1[i] / totalssbar_XL)
-    nr1.append(bx2[i] / totalddbar_XL)
 
 # calc ROC with other way
 for i in range(len(ax1)):
@@ -139,26 +134,7 @@ for i in range(len(ax1)):
     SE1.append(sensXL1)
     SP1.append(specXL1)
 
-for i in range(len(ax1)):
-    tp_su_x.append(bx1[i])
-    fp_su_x.append(bx3[i])
-    tn_su_x.append(ax3[i])
-    fn_su_x.append(ax1[i])
-
-# fill FPR and TPR
-for i in range(len(ax1)):
-    pr2.append(bx1[i] / totalssbar_XL)
-    nr2.append(bx3[i] / totaluubar_XL)
-
-# calc ROC with other way
-for i in range(len(ax1)):
-    sensXL2 = tp_su_x[i] / (tp_su_x[i] + fn_su_x[i])
-    specXL2 = 1 - (tn_su_x[i] / (fp_su_x[i] + tn_su_x[i]))
-    SE2.append(sensXL2)
-    SP2.append(specXL2)
-
 plt.plot(SP1, SE1, "b--", label="roc punkte XLambda (s-u)")
-plt.plot(SP2, SE2, "k--", label="roc punkte XLambda (s-d)")
 plt.plot([1,0], [1,0], "r-", label="random values")
 plt.grid()
 plt.legend()
@@ -168,7 +144,6 @@ plt.savefig("py_output/ROC_XLambda.pdf")
 plt.clf()
 
 plt.plot(nr1, pr1, "b--", label="alt. XLambda (s-u)")
-plt.plot(nr2, pr2, "k--", label="alt. XLambda (s-d)")
 plt.plot([1,0], [1,0], "r-", label="random values")
 plt.grid()
 plt.legend()

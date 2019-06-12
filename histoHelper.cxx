@@ -84,7 +84,7 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("JetPTforKaon", 50, 0., 90., " #Pt [GeV]", "No. of kaons / bin", kZeroMax);
   NewTH1D("TruthNOtherKaons", 6, 0., 6., "No. of K_s", "No. of kaons / bin", kZeroMax);
   NewTH1D("Charge", 5, -2., 2., "multplied charge (-1 or 1) of track_charge tuple", "No. multiplied track charges / bin", kZeroMax);
-  NewTH1D("DeltaR_A", 75, 0., 0.6, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_A", 75, 0., 1., "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("DeltaR_B", 75, 0., 0.6, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("LInvMass_true_p_pi", 75, 1070., 1500.,  "M(#Lambda) for T1(p), T2(#pi)", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("LInvMass_fake_p_pi", 75, 1070., 1500., "M(#Lambda) for T1(p), T2(#pi), fake candidates", "No. of #Lambda / bin", kZeroMax);
@@ -97,10 +97,11 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("PTLambda_A", 75, 0., 40., "Lambda PT [GeV]", "No. Candidates / bin", kZeroMax);
   NewTH1D("PTLambda_B", 75, 0., 40., "Lambda PT [GeV]", "No. Candidates / bin", kZeroMax);
   NewTH1D("XLambda", 75, 0., 1., "X_#Lambda", "No. / bin", kZeroMax);
-  NewTH1D("DeltaR_A_fake", 75, 0., 0.6, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_A_fake", 75, 0., 2*M_PI, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
   NewTH1D("PTLambda_A_fake", 75, 0., 40., "Lambda PT, fakes [GeV]", "No. Candidates / bin", kZeroMax);
   NewTH1D("XLambda_fake", 75, 0., 1., "X_#Lambda fakes", "No. / bin", kZeroMax);
   NewTH1D("absvertex1", 75, 0., 100., "sqrt(vx^2 + vy^2)", "No. / bin", kZeroMax);
+  NewTH1D("jetPTL", 75, 0., 100., "jet PT", "No. / bin", kZeroMax);
    // the correct order is important here, because its implicitly used in retrieving the histograms from an instance
   v_TProfile = new vector<TProfile*>;
   //  NewTProfile("h_Jet2PartonMatch", 6, 0., 6., "bhad | blep | lq1 | lq2 | all | true found", "matching efficiency", kZeroOne);

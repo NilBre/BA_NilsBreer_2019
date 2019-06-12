@@ -81,7 +81,8 @@ class histoHelper {
     hashDeltaR_A_fake,
     hashPTLambda_A_fake,
     hashXLambda_fake,
-    hashabsvertex1
+    hashabsvertex1,
+    hashjetPTL
     };
 
   enum histoHashTProfile {
