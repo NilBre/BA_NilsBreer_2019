@@ -105,6 +105,9 @@ j, ax3, bx3, a_fake3, b_fake3 = np.genfromtxt("uubar_werte_XL.txt", unpack=True)
 totalssbar_XL = ax1[0] + bx1[0]
 totalddbar_XL = ax2[0] + bx2[0]
 totaluubar_XL = ax3[0] + bx3[0]
+totalfakes_s = a_fake1[0] + b_fake1[0]
+totalfakes_d = a_fake2[0] + b_fake2[0]
+totalfakes_u = a_fake3[0] + b_fake3[0]
 # for ssbar
 tp_sd_x = []
 fp_sd_x = []
@@ -114,27 +117,84 @@ pr1 = []
 nr1 = []
 SE1 = []
 SP1 = []
+# for ddbar
+tp_dd_x = []
+fp_dd_x = []
+tn_dd_x = []
+fn_dd_x = []
+pr2 = []
+nr2 = []
+SE2 = []
+SP2 = []
+# for uubar
+tp_uu_x = []
+fp_uu_x = []
+tn_uu_x = []
+fn_uu_x = []
+pr3 = []
+nr3 = []
+SE3 = []
+SP3 = []
 
 # calc important values
 for i in range(len(ax1)):
-    fp_sd_x.append(b_fake1[i])
     tp_sd_x.append(bx1[i])
-    fn_sd_x.append(ax1[i])
+    fp_sd_x.append(b_fake1[i])
     tn_sd_x.append(a_fake1[i])
+    fn_sd_x.append(ax1[i])
 
 # fill FPR and TPR
 for i in range(len(ax1)):
-    nr1.append(b_fake1[i] / totalssbar_XL)
-    pr1.append(bx1[i] / totalssbar_XL)
+    pr1.append(b_fake1[i] / totalfakes_s)
+    nr1.append(bx1[i] / totalfakes_s)
 
+print(totalfakes_s)
 # calc ROC with other way
 for i in range(len(ax1)):
     sensXL1 = tp_sd_x[i] / (tp_sd_x[i] + fn_sd_x[i])
     specXL1 = 1 - (tn_sd_x[i] / (fp_sd_x[i] + tn_sd_x[i]))
     SE1.append(sensXL1)
     SP1.append(specXL1)
+# ----------------
+for i in range(len(ax2)):
+    tp_dd_x.append(bx2[i])
+    fp_dd_x.append(b_fake2[i])
+    tn_dd_x.append(a_fake2[i])
+    fn_dd_x.append(ax2[i])
 
-plt.plot(SP1, SE1, "b--", label="roc punkte XLambda (s-u)")
+# fill FPR and TPR
+for i in range(len(ax2)):
+    pr2.append(b_fake2[i] / totalfakes_d)
+    nr2.append(bx2[i] / totalfakes_d)
+
+# calc ROC with other way
+for i in range(len(ax2)):
+    sensXL2 = tp_dd_x[i] / (tp_dd_x[i] + fn_dd_x[i])
+    specXL2 = 1 - (tn_dd_x[i] / (fp_dd_x[i] + tn_dd_x[i]))
+    SE2.append(sensXL2)
+    SP2.append(specXL2)
+# ---------------------
+for i in range(len(ax3)):
+    tp_uu_x.append(bx3[i])
+    fp_uu_x.append(b_fake3[i])
+    tn_uu_x.append(a_fake3[i])
+    fn_uu_x.append(ax3[i])
+
+# fill FPR and TPR
+for i in range(len(ax3)):
+    pr3.append(b_fake3[i] / totalfakes_u)
+    nr3.append(bx3[i] / totalfakes_u)
+
+# calc ROC with other way
+for i in range(len(ax3)):
+    sensXL3 = tp_uu_x[i] / (tp_uu_x[i] + fn_uu_x[i])
+    specXL3 = 1 - (tn_uu_x[i] / (fp_uu_x[i] + tn_uu_x[i]))
+    SE3.append(sensXL3)
+    SP3.append(specXL3)
+
+plt.plot(SP1, SE1, "b--", label="roc punkte XLambda, strange")
+plt.plot(SP2, SE2, "k--", label="roc punkte XLambda, down")
+plt.plot(SP3, SE3, "g--", label="roc punkte XLambda, up")
 plt.plot([1,0], [1,0], "r-", label="random values")
 plt.grid()
 plt.legend()
@@ -143,7 +203,9 @@ plt.ylabel("sensitivity")
 plt.savefig("py_output/ROC_XLambda.pdf")
 plt.clf()
 
-plt.plot(nr1, pr1, "b--", label="alt. XLambda (s-u)")
+plt.plot(nr1, pr1, "b--", label="alt. XLambda, strange")
+plt.plot(nr2, pr2, "k--", label="alt. XLambda, down")
+plt.plot(nr3, pr3, "g--", label="alt. XLambda, up")
 plt.plot([1,0], [1,0], "r-", label="random values")
 plt.grid()
 plt.legend()
