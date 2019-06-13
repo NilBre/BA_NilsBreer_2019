@@ -18,6 +18,10 @@ void drawBoth(TFile * f1, TFile * f2, TString histogramname1, TString histogramn
           TString xaxislabel, TString unit, TString yaxislabel,
           TString legendentry1, TString legendentry2);
 
+void drawSingle(TFile * f1, TString histogramname1, TString histogramname2,
+          TString xaxislabel, TString unit, TString yaxislabel,
+          TString legendentry1);
+
 double maximum(TH1 * h1, TH1 * h2, TH1 * h3);
 double maximum_new(TH1 * h1, TH1 * h2, TH1 * h3, TH1 * h4);
 
@@ -124,11 +128,70 @@ int main() {
   drawBoth(myFile1, myFile2, "XLambda", "XLambda_fake", "", "", "", legendentry1, legendentry2);
   draw(myFile1, myFile2, myFile3, "absvertex1", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "jetPTL", "", "", "", legendentry1, legendentry2, legendentry3);
+  drawSingle(myFile1, "XLambda", "XLambda_fake", "", "", "", legendentry1);
   return 0;
 }
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
+
+void drawSingle(TFile * f1, TString histogramname1, TString histogramname2,
+          TString xaxislabel, TString unit, TString yaxislabel,
+          TString legendentry1)
+{
+    TH1 * hist1 = (TH1*)f1->Get(histogramname1);
+    TH1 * hist2 = (TH1*)f1->Get(histogramname2);
+
+    if (yaxislabel != "Efficiency"){
+      hist1->Scale(1./(hist1->Integral()+hist1->GetBinContent(0)+hist1->GetBinContent(hist1->GetNbinsX()+1))); // add overflow and underflow bins
+      hist2->Scale(1./(hist2->Integral()+hist2->GetBinContent(0)+hist2->GetBinContent(hist2->GetNbinsX()+1))); // add overflow and underflow bins
+    }
+      // histogram line styles
+      hist1->SetLineColor(kRed);
+      hist1->SetLineStyle(kSolid);
+      hist1->SetMarkerSize(0);
+      hist1->SetFillColorAlpha(kRed, 0.35);
+
+      hist2->SetLineColor(kBlue);
+      hist2->SetLineStyle(kSolid);
+      hist2->SetMarkerSize(0);
+      hist2->SetFillColorAlpha(kRed, 0.35);
+
+      double yoffset(0.);
+      yoffset += 0.1;
+      TLegend * l = new TLegend(0.6, 0.8-yoffset, 0.9, 0.9);
+      l->SetTextAlign(12);
+      l->AddEntry(hist1, legendentry1 + TString(", true candidates"), "l");
+      l->AddEntry(hist2, legendentry1 + TString(", fake candidates"), "l");
+      l->SetFillColor(0);
+      l->SetBorderSize(0);
+      l->SetTextSize(0.025);
+
+      TCanvas * cs = new TCanvas("cs", "cs", 1);
+      // float epsilon = 0;
+      if (unit != "") xaxislabel += " [" + unit + "]";
+      if (xaxislabel != "") hist1->GetXaxis()->SetTitle(xaxislabel);
+      if (yaxislabel == "Events / Bin") {
+        double binsize = hist1->GetXaxis()->GetBinWidth(1); // assuming all bins have the same width
+        yaxislabel = TString("Events / ");
+        yaxislabel += Form("%4.2f", binsize);
+        yaxislabel += " " + unit;
+      }
+      // if (yaxislabel != "Efficiency")
+      //   hist1->GetYaxis()->SetRangeUser(epsilon, maximum_new(hist1, hist2));
+      if (histogramname1 == "HasBestPermutationEfficiency") {
+        hist1->GetXaxis()->SetBinLabel(1, "Has at least one good permutation");
+        yaxislabel = "Efficiency";
+      }
+      if (yaxislabel != "") hist1->GetYaxis()->SetTitle(yaxislabel);
+      hist1->Draw("h");
+      hist2->Draw("hsame");
+      l->Draw();
+
+      cs->Print(TString("output/") + histogramname1 + "_" + histogramname2 + "_single.png");
+      cs->Print(TString("output/") + histogramname1 + "_" + histogramname2 + "_single.pdf");
+      delete cs;
+}
 
 void drawBoth(TFile * f1, TFile * f2, TString histogramname1, TString histogramname2,
           TString xaxislabel, TString unit, TString yaxislabel,

@@ -611,7 +611,31 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
   // man muss von rechts nach links schieben!!
   float lowerborder1 = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinLowEdge(0);
-  float lowerborder2 = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinLowEdge(0);
+
+  // in file 3 sind in der 2. zeile die bineintraege fuer X_Lambda
+  // und in der 3. spalte die bineintraege fuer deltaR gespeichert
+  float w0 = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
+  int N = 1/w0;
+  for (int j = 0; j < N; j++){
+      float bins_xlambda[100] = {};
+      float bins_deltaR[100] = {};
+      bins_xlambda[j] = (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(j));
+      bins_deltaR[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(j));
+      if (pdgid == 3){
+          // fuer ssbar, jeweils xlambda und deltaR
+          ifile3 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << endl;
+      }
+      if (pdgid == 1){
+          // fuer ddbar
+          ifile3 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << endl;
+      }
+      if (pdgid == 2){
+          // fuer uubar
+          ifile3 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << endl;
+      }
+  }
+  // test
+
   float cutsDR[66] = {6.2, 6., 5.9, 5.8, 5.7, 5.6, 5.5, 5.4, 5.3, 5.2,
                       5.1, 5., 4.9, 4.8, 4.7, 4.6, 4.5, 4.4, 4.3, 4.2,
                       4.1, 4., 3.9, 3.8, 3.7, 3.6, 3.5, 3.4, 3.3, 3.2,
@@ -650,7 +674,7 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
           ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaDR_fake << "\t" << rightAreaDR_fake << endl;
       }
   }
-
+/*
   float wxl = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
   float cutsXL[21] = {1., 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0};
   for (int j = 0; j < 21; j++){
@@ -685,7 +709,7 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
           ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << "\t" << leftAreaXL_fake << "\t" << rightAreaXL_fake << endl;
       }
   }
-
+*/
   float lbordervv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinLowEdge(0);
   float cutsvxvy[29] = {100., 90., 80., 70., 60., 50., 40., 30., 20., 19., 18., 17., 16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1., 0.};
   for (int j = 0; j < 29; j++){

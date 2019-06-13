@@ -6,6 +6,12 @@
 # 5. plotte gesamt, gegen die zerfaelle in p und pi- ->> wie geht das?
 # 6. vector<int> * Track_PID;
 # 7  vector<int> * Track_Charge;
+# done
 
-# als erstes mit 7. nur positiv geladene tracks nehmen
-# mit 6. kann ich die TrackPID auf die eines protons ueberpruefen
+# now:
+# sensitivity(s) gegen 1 = specificity(d, u) fuer deltaR, Pt(L)/Pt(Jet),
+# invariante masse
+
+# jeweils einen plot bzgl. s und d mit 3 kurven und einen
+# bzgl. s und u mit jeweils 3 kurven (m, dR, XL)
+ 
