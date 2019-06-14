@@ -106,10 +106,6 @@ int main() {
   draw(myFile1, myFile2, myFile3, "KaonPT", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "KaonXk", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "KaonDeltaR", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "LambdaInvMass", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "LambdaPT", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "LambdaXk", "", "", "", legendentry1, legendentry2, legendentry3);
-  draw(myFile1, myFile2, myFile3, "LambdaDeltaR", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "JetPTforKaon", "", "", "", legendentry1, legendentry2, legendentry3);
   draw(myFile1, myFile2, myFile3, "TruthNOtherKaons", "", "", "", legendentry1, legendentry2, legendentry3);
   drawBoth(myFile1, myFile2, "TruthNKaons", "TruthNOtherKaons", "", "", "", legendentry1, legendentry2);
