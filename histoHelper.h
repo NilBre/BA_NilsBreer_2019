@@ -82,7 +82,11 @@ class histoHelper {
     hashPTLambda_A_fake,
     hashXLambda_fake,
     hashabsvertex1,
-    hashjetPTL
+    hashjetPTL,
+    hashDeltaR_A2,
+    hashDeltaR_A3,
+    hashDeltaR_A2_fake,
+    hashDeltaR_A3_fake
     };
 
   enum histoHashTProfile {

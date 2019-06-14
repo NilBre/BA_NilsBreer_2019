@@ -31,9 +31,9 @@ clean :
 	rm lambda_mittelwerte1.txt
 	rm lambda_mittelwerte2.txt
 	rm lambda_mittelwerte3.txt
-	rm ssbar_werte.txt
-	rm ddbar_werte.txt
-	rm uubar_werte.txt
-	rm ssbar_werte_XL.txt
-	rm ddbar_werte_XL.txt
-	rm uubar_werte_XL.txt
+	rm rocwerte_ssbar.txt
+	rm rocwerte_ddbar.txt
+	rm rocwerte_uubar.txt
+	rm vxvywerte_ssbar.txt
+	rm vxvywerte_ddbar.txt
+	rm vxvywerte_uubar.txt

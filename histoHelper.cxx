@@ -84,10 +84,10 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("JetPTforKaon", 50, 0., 90., " #Pt [GeV]", "No. of kaons / bin", kZeroMax);
   NewTH1D("TruthNOtherKaons", 6, 0., 6., "No. of K_s", "No. of kaons / bin", kZeroMax);
   NewTH1D("Charge", 5, -2., 2., "multplied charge (-1 or 1) of track_charge tuple", "No. multiplied track charges / bin", kZeroMax);
-  NewTH1D("DeltaR_A", 100, 0., 2*M_PI, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
-  NewTH1D("DeltaR_B", 100, 0., 0.6, "dist(#Lambda-Ref, track) in #eta-#phi plane", "No. Tracks / bin", kZeroMax);
-  NewTH1D("LInvMass_true_p_pi", 100, 1070., 1500.,  "M(#Lambda) for T1(p), T2(#pi)", "No. of #Lambda / bin", kZeroMax);
-  NewTH1D("LInvMass_fake_p_pi", 100, 1070., 1500., "M(#Lambda) for T1(p), T2(#pi), fake candidates", "No. of #Lambda / bin", kZeroMax);
+  NewTH1D("DeltaR_A", 100, 0., 2*M_PI, "dR(#Lambda-Ref, track)", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_B", 100, 0., 0.6, "dR(#Lambda-Ref, track)", "No. Tracks / bin", kZeroMax);
+  NewTH1D("LInvMass_true_p_pi", 100, 1105., 1125.,  "M(#Lambda) for T1(p), T2(#pi)", "No. of #Lambda / bin", kZeroMax);
+  NewTH1D("LInvMass_fake_p_pi", 100, 1105., 1125., "M(#Lambda) for T1(p), T2(#pi), fake candidates", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("LInvMass_true_pi_p", 100, 1200., 3000.,  "M(#Lambda) for T1(#pi), T2(p)", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("LInvMass_fake_pi_p", 100, 1200., 3000., "M(#Lambda) for T1(#pi), T2(p), fake caandidates", "No. of #Lambda / bin", kZeroMax);
   NewTH1D("ArithMean", 100, 1200., 2200.,  "arithm mean of both candidates", "No. of #Lambda / bin", kZeroMax);
@@ -102,6 +102,10 @@ histoHelper::histoHelper(int pdgid) {
   NewTH1D("XLambda_fake", 100, 0., 1., "X_#Lambda fakes", "No. / bin", kZeroMax);
   NewTH1D("absvertex1", 100, 0., 100., "sqrt(vx^2 + vy^2)", "No. / bin", kZeroMax);
   NewTH1D("jetPTL", 100, 0., 100., "jet PT", "No. / bin", kZeroMax);
+  NewTH1D("DeltaR_A2", 100, 0., 2*M_PI, "dR(#Lambda-Ref, track)", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_A3", 100, 0., 2*M_PI, "dR(#Lambda-Ref, track)", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_A2_fake", 100, 0., 2*M_PI, "dR(#Lambda-Ref, track)", "No. Tracks / bin", kZeroMax);
+  NewTH1D("DeltaR_A3_fake", 100, 0., 2*M_PI, "dR(#Lambda-Ref, track)", "No. Tracks / bin", kZeroMax);
    // the correct order is important here, because its implicitly used in retrieving the histograms from an instance
   v_TProfile = new vector<TProfile*>;
   //  NewTProfile("h_Jet2PartonMatch", 6, 0., 6., "bhad | blep | lq1 | lq2 | all | true found", "matching efficiency", kZeroOne);

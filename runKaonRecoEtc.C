@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3, ofstream &ifile4) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -424,10 +424,12 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
             TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
             TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
             TLorentzVector vLambda_Ref = lvhelp->getLambdaTLV(i); // lambda referenz
-            float dR_A = LambdaCandidate_A.DeltaR(vLambda_Ref); // deltaR zwischen lambda referenz und summenspur
+            float dR_A1 = LambdaCandidate_A.DeltaR(vLambda_Ref); // deltaR zwischen lambda referenz und summenspur
+            float dR_A2 = LambdaCandidate_A.DeltaR(vJet);
+            float dR_A3 = LambdaCandidate_A.DeltaR(vIsLambdaJet);
             float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
             histohelp->GetTH1D(histoHelper::hashjetPTL)->Fill(vIsLambdaJet.Pt());
-                if (dR_A < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
+                if (dR_A1 < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
                 { // true teilchen, wenn dR < 0.5
                     if (LambdaCandidate_A.Pt() < 0.5){ // minimum candidate Pt von 500 MeV
                         continue;
@@ -453,7 +455,9 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                         float Vx1 = (*tree->Track_X)[trackPairs[i].first];
                         float Vy1 = (*tree->Track_Y)[trackPairs[i].second];
                         float d1 = sqrt(Vx1*Vx1 + Vy1*Vy1);
-                        histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A);
+                        histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A1);
+                        histohelp->GetTH1D(histoHelper::hashDeltaR_A2)->Fill(dR_A2);
+                        histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->Fill(dR_A3);
                         histohelp->GetTH1D(histoHelper::hashabsvertex1)->Fill(d1);
                         histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
                         histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
@@ -484,7 +488,9 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                     // fill histogram with invariant mass for this same candidate but result in plot for fakes
                     // cout << dR_A << endl;
                     histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
-                    histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->Fill(dR_A);
+                    histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->Fill(dR_A1);
+                    histohelp->GetTH1D(histoHelper::hashDeltaR_A2_fake)->Fill(dR_A2);
+                    histohelp->GetTH1D(histoHelper::hashDeltaR_A3_fake)->Fill(dR_A3);
                     histohelp->GetTH1D(histoHelper::hashPTLambda_A_fake)->Fill(LambdaPtA);
                     histohelp->GetTH1D(histoHelper::hashXLambda_fake)->Fill(X_Lambda);
                 }
@@ -605,111 +611,36 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   histohelp->finalize(histofilename);
 
   // ------------------
-  // testrealm for BA
+  // wegspeichern der bineintraege in python array
   // ------------------
-  float wdr = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinWidth(0);
-  float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
-  // man muss von rechts nach links schieben!!
-  float lowerborder1 = histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinLowEdge(0);
-
-  // in file 3 sind in der 2. zeile die bineintraege fuer X_Lambda
-  // und in der 3. spalte die bineintraege fuer deltaR gespeichert
   float w0 = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
   int N = 1/w0;
   for (int j = 0; j < N; j++){
       float bins_xlambda[100] = {};
       float bins_deltaR[100] = {};
+      float bins_deltaR2[100] = {};
+      float bins_deltaR3[100] = {};
+      float bins_Lmass[100] = {};
       bins_xlambda[j] = (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(j));
       bins_deltaR[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(j));
+      bins_deltaR2[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A2)->GetBinContent(j));
+      bins_deltaR3[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->GetBinContent(j));
+      bins_Lmass[j] = (histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->GetBinContent(j));
       if (pdgid == 3){
           // fuer ssbar, jeweils xlambda und deltaR
-          ifile3 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR2[j] << "\t" << bins_deltaR3[j] << endl;
       }
       if (pdgid == 1){
           // fuer ddbar
-          ifile3 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR2[j] << "\t" << bins_deltaR3[j] << endl;
       }
       if (pdgid == 2){
           // fuer uubar
-          ifile3 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR2[j] << "\t" << bins_deltaR3[j] << endl;
       }
   }
-  // test
 
-  float cutsDR[66] = {6.2, 6., 5.9, 5.8, 5.7, 5.6, 5.5, 5.4, 5.3, 5.2,
-                      5.1, 5., 4.9, 4.8, 4.7, 4.6, 4.5, 4.4, 4.3, 4.2,
-                      4.1, 4., 3.9, 3.8, 3.7, 3.6, 3.5, 3.4, 3.3, 3.2,
-                      3.1, 3., 2.9, 2.8, 2.7, 2.6, 2.5, 2.4, 2.3, 2.2,
-                      2.1, 2., 1.9, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3, 1.2,
-                      1.1, 1., 0.9, 0.8, 0.7, 0.6, 0.5, 0.45, 0.4, 0.35,
-                      0.3, 0.25, 0.2, 0.15, 0.1, 0.05};
-  for (int j = 0; j < 66; j++){
-      float distDR = abs(lowerborder1 - cutsDR[j]);
-      int Ndr = distDR / wdr; // anzahl an schritten bis zum cut
-      float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
-      float leftAreaDR = 0;
-      float rightAreaDR = 0;
-      float leftAreaDR_fake = 0;
-      float rightAreaDR_fake = 0;
-      for (int k = 0; k < Ndr; k++){
-          leftAreaDR += (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(k));
-      }
-      for (int m = Ndr; m < end; m++){
-          rightAreaDR += (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(m));
-      }
-      for (int n = 0; n < Ndr; n++){
-          leftAreaDR_fake += (histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->GetBinContent(n));
-      }
-      for (int l = Ndr; l < end; l++){
-          rightAreaDR_fake += (histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->GetBinContent(l));
-      }
-
-      if (pdgid == 3){
-          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaDR_fake << "\t" << rightAreaDR_fake << endl;
-      }
-      if (pdgid == 1){
-          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaDR_fake << "\t" << rightAreaDR_fake << endl;
-      }
-      if (pdgid == 2){
-          ifile2 << j << "\t" << leftAreaDR << "\t" << rightAreaDR << "\t" << leftAreaDR_fake << "\t" << rightAreaDR_fake << endl;
-      }
-  }
-/*
-  float wxl = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
-  float cutsXL[21] = {1., 0.95, 0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.2, 0.15, 0.1, 0.05, 0};
-  for (int j = 0; j < 21; j++){
-      float distXL = abs(lowerborder2 - cutsXL[j]);
-      int Nxl = distXL / wxl;
-      float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
-      float leftAreaXL = 0;
-      float rightAreaXL = 0;
-      float leftAreaXL_fake = 0;
-      float rightAreaXL_fake = 0;
-
-      for (int a = 0; a < Nxl; a++){
-          leftAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(a));
-      }
-      for (int b = Nxl; b < end; b++){
-          rightAreaXL += (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(b));
-      }
-      for (int c = 0; c < Nxl; c++){
-          leftAreaXL_fake += (histohelp->GetTH1D(histoHelper::hashXLambda_fake)->GetBinContent(c));
-      }
-      for (int d = Nxl; d < end; d++){
-          rightAreaXL_fake += (histohelp->GetTH1D(histoHelper::hashXLambda_fake)->GetBinContent(d));
-      }
-      // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
-      if (pdgid == 3){
-          ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << "\t" << leftAreaXL_fake << "\t" << rightAreaXL_fake << endl;
-      }
-      if (pdgid == 1){
-          ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << "\t" << leftAreaXL_fake << "\t" << rightAreaXL_fake << endl;
-      }
-      if (pdgid == 2){
-          ifile3 << j << "\t" << leftAreaXL << "\t" << rightAreaXL << "\t" << leftAreaXL_fake << "\t" << rightAreaXL_fake << endl;
-      }
-  }
-*/
+  float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
   float lbordervv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinLowEdge(0);
   float cutsvxvy[29] = {100., 90., 80., 70., 60., 50., 40., 30., 20., 19., 18., 17., 16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1., 0.};
   for (int j = 0; j < 29; j++){
@@ -726,13 +657,13 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
       }
       // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
       if (pdgid == 3){
-          ifile4 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+          ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
       }
       if (pdgid == 1){
-          ifile4 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+          ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
       }
       if (pdgid == 2){
-          ifile4 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+          ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
       }
   }
 // ------------------
@@ -816,47 +747,38 @@ int main() {
 
     // LR: left right ~ bezieht sich auf die flaechen
     // for DeltaR
-    ofstream LRssbar;
-    LRssbar.open("ssbar_werte.txt");
-    ofstream LRddbar;
-    LRddbar.open("ddbar_werte.txt");
-    ofstream LRuubar;
-    LRuubar.open("uubar_werte.txt");
+    ofstream rocdata1;
+    rocdata1.open("rocwerte_ssbar.txt");
+    ofstream rocdata2;
+    rocdata2.open("rocwerte_ddbar.txt");
+    ofstream rocdata3;
+    rocdata3.open("rocwerte_uubar.txt");
 
     // for XLambda
-    ofstream XLss;
-    XLss.open("ssbar_werte_XL.txt");
-    ofstream XLdd;
-    XLdd.open("ddbar_werte_XL.txt");
-    ofstream XLuu;
-    XLuu.open("uubar_werte_XL.txt");
+    ofstream vxvy1;
+    vxvy1.open("vxvywerte_ssbar.txt");
+    ofstream vxvy2;
+    vxvy2.open("vxvywerte_ddbar.txt");
+    ofstream vxvy3;
+    vxvy3.open("vxvywerte_uubar.txt");
 
-    ofstream vvss;
-    vvss.open("ssbar_vxvy.txt");
-    ofstream vvdd;
-    vvdd.open("ddbar_vxvy.txt");
-    ofstream vvuu;
-    vvuu.open("uubar_vxvy.txt");
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, LRssbar, XLss, vvss);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, LRddbar, XLdd, vvdd);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, LRuubar, XLuu, vvuu);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, rocdata1, vxvy1);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, rocdata2, vxvy2);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, rocdata3, vxvy3);
   mittel1.close();
   mittel2.close();
   mittel3.close();
-  LRssbar.close();
-  LRddbar.close();
-  LRuubar.close();
-  XLss.close();
-  XLdd.close();
-  XLuu.close();
-  vvss.close();
-  vvdd.close();
-  vvuu.close();
+  rocdata1.close();
+  rocdata2.close();
+  rocdata3.close();
+  vxvy1.close();
+  vxvy2.close();
+  vxvy3.close();
   // end happily
   return 0;
 }
