@@ -424,12 +424,11 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
             TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
             TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
             TLorentzVector vLambda_Ref = lvhelp->getLambdaTLV(i); // lambda referenz
-            float dR_A1 = LambdaCandidate_A.DeltaR(vLambda_Ref); // deltaR zwischen lambda referenz und summenspur
-            float dR_A2 = LambdaCandidate_A.DeltaR(vJet);
+            // float dR_A1 = LambdaCandidate_A.DeltaR(vLambda_Ref); // deltaR zwischen lambda referenz und summenspur
             float dR_A3 = LambdaCandidate_A.DeltaR(vIsLambdaJet);
             float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
             histohelp->GetTH1D(histoHelper::hashjetPTL)->Fill(vIsLambdaJet.Pt());
-                if (dR_A1 < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
+                if (dR_A3 < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
                 { // true teilchen, wenn dR < 0.5
                     if (LambdaCandidate_A.Pt() < 0.5){ // minimum candidate Pt von 500 MeV
                         continue;
@@ -455,8 +454,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                         float Vx1 = (*tree->Track_X)[trackPairs[i].first];
                         float Vy1 = (*tree->Track_Y)[trackPairs[i].second];
                         float d1 = sqrt(Vx1*Vx1 + Vy1*Vy1);
-                        histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A1);
-                        histohelp->GetTH1D(histoHelper::hashDeltaR_A2)->Fill(dR_A2);
+                        // histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A1);
                         histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->Fill(dR_A3);
                         histohelp->GetTH1D(histoHelper::hashabsvertex1)->Fill(d1);
                         histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
@@ -488,8 +486,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                     // fill histogram with invariant mass for this same candidate but result in plot for fakes
                     // cout << dR_A << endl;
                     histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
-                    histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->Fill(dR_A1);
-                    histohelp->GetTH1D(histoHelper::hashDeltaR_A2_fake)->Fill(dR_A2);
+                    // histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->Fill(dR_A1);
                     histohelp->GetTH1D(histoHelper::hashDeltaR_A3_fake)->Fill(dR_A3);
                     histohelp->GetTH1D(histoHelper::hashPTLambda_A_fake)->Fill(LambdaPtA);
                     histohelp->GetTH1D(histoHelper::hashXLambda_fake)->Fill(X_Lambda);
@@ -618,25 +615,23 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   for (int j = 0; j < N; j++){
       float bins_xlambda[100] = {};
       float bins_deltaR[100] = {};
-      float bins_deltaR2[100] = {};
       float bins_deltaR3[100] = {};
       float bins_Lmass[100] = {};
       bins_xlambda[j] = (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(j));
       bins_deltaR[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(j));
-      bins_deltaR2[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A2)->GetBinContent(j));
       bins_deltaR3[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->GetBinContent(j));
       bins_Lmass[j] = (histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->GetBinContent(j));
       if (pdgid == 3){
           // fuer ssbar, jeweils xlambda und deltaR
-          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR2[j] << "\t" << bins_deltaR3[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << endl;
       }
       if (pdgid == 1){
           // fuer ddbar
-          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR2[j] << "\t" << bins_deltaR3[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << endl;
       }
       if (pdgid == 2){
           // fuer uubar
-          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR2[j] << "\t" << bins_deltaR3[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << endl;
       }
   }
 
