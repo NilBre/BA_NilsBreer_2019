@@ -70,7 +70,6 @@ class histoHelper {
     hashPTLambda_A_fake,
     hashXLambda_fake,
     hashabsvertex1,
-    hashjetPTL,
     hashDeltaR_A3,
     hashDeltaR_A3_fake
     };

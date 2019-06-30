@@ -34,6 +34,6 @@ clean :
 	rm rocwerte_ssbar.txt
 	rm rocwerte_ddbar.txt
 	rm rocwerte_uubar.txt
-	rm vxvywerte_ssbar.txt
-	rm vxvywerte_ddbar.txt
-	rm vxvywerte_uubar.txt
+	# rm vxvywerte_ssbar.txt
+	# rm vxvywerte_ddbar.txt
+	# rm vxvywerte_uubar.txt

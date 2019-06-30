@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -90,11 +90,9 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
 
     // get entry no. iEntry and tell every 10000th event
     tree->GetEntry(iEntry);
-    // cout << tree->GetEntry(iEntry) << endl;
-    if ((iEntry+1)%10000 == 0) {
-      // cout << tree->GetEntry(iEntry) << endl;;
-      cout << "INFO processing the " << iEntry+1 << "th event" << endl;
-    }
+    // if ((iEntry+1)%10000 == 0) {
+    //   cout << "INFO processing the " << iEntry+1 << "th event" << endl;
+    // }
     // // // // // // // // // // // // // // // // // // // //
 
     // loop over all truth jets to find leading jet in pT
@@ -150,33 +148,30 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
       if (vGenJet.DeltaR(vLambda) > jetDR) { // ereignisse ausserhalb des cones
           continue;
       }
-      // if ((*tree->LambdaDaughter1_PID)[iLambda] != 2212 &&
-      //     (*tree->LambdaDaughter2_PID)[iLambda] != 211) // das sind protonen
-      //     {
-      //         countOtherLamb++;
-      //         countToOtherLambda += countOtherLamb;
-      //         continue;
-      //     }
-      //     nLambdasInTruth++;
-      //     counterToLambda += nLambdasInTruth;
-      // hier nur wirkliche lambdas, keine antilambdas betrachten
-      if (((*tree->LambdaDaughter1_PID)[iLambda] == 2212 && (*tree->LambdaDaughter2_PID)[iLambda] == -211)
-      || ((*tree->LambdaDaughter1_PID)[iLambda] == -211 && (*tree->LambdaDaughter2_PID)[iLambda] == 2212)
-      || ((*tree->LambdaDaughter1_PID)[iLambda] == -2212 && (*tree->LambdaDaughter2_PID)[iLambda] == 211)
-      || ((*tree->LambdaDaughter1_PID)[iLambda] == 211 && (*tree->LambdaDaughter2_PID)[iLambda] == -2212)){
+      if ((*tree->LambdaDaughter1_PID)[iLambda] != 2212 &&
+          (*tree->LambdaDaughter2_PID)[iLambda] != 211)
+          {
+              countOtherLamb++;
+              countToOtherLambda += countOtherLamb;
+              continue;
+          }
           nLambdasInTruth++;
           counterToLambda += nLambdasInTruth;
-      }
-      else{
-          countOtherLamb++;
-          countToOtherLambda += countOtherLamb;
-          continue;
-      }
+      // if (((*tree->LambdaDaughter1_PID)[iLambda] == 2212 && (*tree->LambdaDaughter2_PID)[iLambda] == -211)
+      // || ((*tree->LambdaDaughter1_PID)[iLambda] == -211 && (*tree->LambdaDaughter2_PID)[iLambda] == 2212)){
+      //     nLambdasInTruth++;
+      //     counterToLambda += nLambdasInTruth;
+      // }
+      // else{
+      //     countOtherLamb++;
+      //     countToOtherLambda += countOtherLamb;
+      //     continue;
+      // }
 
-      TLorentzVector vLDaughterP1 = lvhelp->getLambdaDaughterP1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
-      TLorentzVector vLDaughterP2 = lvhelp->getLambdaDaughterP2TLV(iLambda);
-      TLorentzVector vLDaughterPi1 = lvhelp->getLambdaDaughterPi1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
-      TLorentzVector vLDaughterPi2 = lvhelp->getLambdaDaughterPi2TLV(iLambda);
+      // TLorentzVector vLDaughterP1 = lvhelp->getLambdaDaughterP1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
+      // TLorentzVector vLDaughterP2 = lvhelp->getLambdaDaughterP2TLV(iLambda);
+      // TLorentzVector vLDaughterPi1 = lvhelp->getLambdaDaughterPi1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
+      // TLorentzVector vLDaughterPi2 = lvhelp->getLambdaDaughterPi2TLV(iLambda);
   }
   histohelp->GetTH1D(histoHelper::hashTruthNlambdas)->Fill(nLambdasInTruth);
       // -----------------------------------
@@ -419,78 +414,83 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
         }
         for (int i = 0, nTrackPairs(trackPairs.size()); i < nTrackPairs; i++)
         {
-            TLorentzVector vIsLambdaJet = lvhelp->getJetTLV(idx_leadingJet);
-            TLorentzVector vTrack1 = lvhelp->getTrackTLV(trackPairs[iTrackPair].first, LorentzVectorHelper::kProtonMass);
-            TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
-            TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
             TLorentzVector vLambda_Ref = lvhelp->getLambdaTLV(i); // lambda referenz
-            // float dR_A1 = LambdaCandidate_A.DeltaR(vLambda_Ref); // deltaR zwischen lambda referenz und summenspur
-            float dR_A3 = LambdaCandidate_A.DeltaR(vIsLambdaJet);
-            float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
-            histohelp->GetTH1D(histoHelper::hashjetPTL)->Fill(vIsLambdaJet.Pt());
-                if (dR_A3 < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
-                { // true teilchen, wenn dR < 0.5
-                    if (LambdaCandidate_A.Pt() < 0.5){ // minimum candidate Pt von 500 MeV
-                        continue;
-                    }
-                    // bestimme die PIDs der spuren
-                    float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
-                    float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second];
-                    // wirft alle pi+pi- paare raus->in die fakes
-                    if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
-                    {
-                        histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
-                        counter_fake += 1;
-                        continue;
-                    }
-                    else
-                    { // wenn nicht, dann ganz normal den plot fuer die true teilchen fuellen
-                      // schaue welche der beiden differenzen kleiner ist und fuelle diese in das histogramm
-                      // fill histograms with arithmetischem mittel, geometrischem mittel, und normaler inv. mass
-                        float LambdaPtA = LambdaCandidate_A.Pt();
-                        float JetPtA = vIsLambdaJet.Pt();
-                        float X_Lambda = LambdaPtA / JetPtA;
-                        // vertexpositionen x, y:
-                        float Vx1 = (*tree->Track_X)[trackPairs[i].first];
-                        float Vy1 = (*tree->Track_Y)[trackPairs[i].second];
-                        float d1 = sqrt(Vx1*Vx1 + Vy1*Vy1);
-                        // histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A1);
-                        histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->Fill(dR_A3);
-                        histohelp->GetTH1D(histoHelper::hashabsvertex1)->Fill(d1);
-                        histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
-                        histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
-                        histohelp->GetTH1D(histoHelper::hashXLambda)->Fill(X_Lambda);
-
-                        if (pdgid == 3){
-                            ifile1 << LInvMass_p_pi << endl;
-                        }
-                        if (pdgid == 1){
-                            ifile1 << LInvMass_p_pi << endl;
-                        }
-                        if (pdgid == 2){
-                            ifile1 << LInvMass_p_pi << endl;
-                        }
-                        counter_true += 1;
-                    }
-                    // schauen ob sie auch die korrekte masse haben
-                    if (LInvMass_p_pi < minLambdaMass || LInvMass_p_pi > maxLambdaMass)
-                    {
-                        continue;
-                    }
+            TLorentzVector vIsLambdaJet = lvhelp->getJetTLV(idx_leadingJet);
+            if (vJet.DeltaR(vLambda_Ref) < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
+            { // true teilchen, wenn dR < 0.5
+                TLorentzVector vTrack1 = lvhelp->getTrackTLV(trackPairs[iTrackPair].first, LorentzVectorHelper::kProtonMass);
+                TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
+                if (vTrack1.DeltaR(vJet) > 0.5 || vTrack2.DeltaR(vJet) > 0.5)
+                {
+                    continue;
                 }
-                else // wenn deltaR > 0.5 -> fake teilchen
+                TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
+                float dR_A3 = LambdaCandidate_A.DeltaR(vIsLambdaJet); // deltaR zwischen candidate und jet -> muesste eigentlich mit vIsLambdaJet verglichen werden...
+                float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
+                if (LambdaCandidate_A.Pt() < 0.5){ // minimum candidate Pt von 500 MeV
+                    continue;
+                }
+                // bestimme die PIDs der spuren
+                float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
+                float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second];
+                // wirft alle pi+pi- paare raus->in die fakes
+                if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
+                {
+                    histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
+                    counter_fake += 1;
+                    continue;
+                }
+                else
                 {
                     float LambdaPtA = LambdaCandidate_A.Pt();
                     float JetPtA = vIsLambdaJet.Pt();
                     float X_Lambda = LambdaPtA / JetPtA;
-                    // fill histogram with invariant mass for this same candidate but result in plot for fakes
-                    // cout << dR_A << endl;
-                    histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
-                    // histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->Fill(dR_A1);
-                    histohelp->GetTH1D(histoHelper::hashDeltaR_A3_fake)->Fill(dR_A3);
-                    histohelp->GetTH1D(histoHelper::hashPTLambda_A_fake)->Fill(LambdaPtA);
-                    histohelp->GetTH1D(histoHelper::hashXLambda_fake)->Fill(X_Lambda);
+                    // vertexpositionen x, y:
+                    float Vx1 = (*tree->Track_X)[trackPairs[iTrackPair].first];
+                    float Vy1 = (*tree->Track_Y)[trackPairs[iTrackPair].second];
+                    float d1 = sqrt(Vx1*Vx1 + Vy1*Vy1);
+                    // histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A1);
+                    histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->Fill(dR_A3);
+                    histohelp->GetTH1D(histoHelper::hashabsvertex1)->Fill(d1);
+                    histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->Fill(LInvMass_p_pi*1000); // fill histogram with invariant mass for that candidate
+                    histohelp->GetTH1D(histoHelper::hashPTLambda_A)->Fill(LambdaPtA);
+                    histohelp->GetTH1D(histoHelper::hashXLambda)->Fill(X_Lambda);
+
+                    if (pdgid == 3){
+                        ifile1 << LInvMass_p_pi << endl;
+                    }
+                    if (pdgid == 1){
+                        ifile1 << LInvMass_p_pi << endl;
+                    }
+                    if (pdgid == 2){
+                        ifile1 << LInvMass_p_pi << endl;
+                    }
+                    counter_true += 1;
                 }
+                // schauen ob sie auch die korrekte masse haben
+                if (LInvMass_p_pi < minLambdaMass || LInvMass_p_pi > maxLambdaMass)
+                {
+                    continue;
+                }
+            }
+            else // wenn deltaR > 0.5 -> fake teilchen
+            {
+                TLorentzVector vTrack1 = lvhelp->getTrackTLV(trackPairs[iTrackPair].first, LorentzVectorHelper::kProtonMass);
+                TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
+                TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
+                float LInvMass_p_pi = LambdaCandidate_A.M();
+                float dR_A3 = LambdaCandidate_A.DeltaR(vIsLambdaJet);
+                float LambdaPtA = LambdaCandidate_A.Pt();
+                float JetPtA = vIsLambdaJet.Pt();
+                float X_Lambda = LambdaPtA / JetPtA;
+                // fill histogram with invariant mass for this same candidate but result in plot for fakes
+                // cout << dR_A << endl;
+                histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
+                // histohelp->GetTH1D(histoHelper::hashDeltaR_A_fake)->Fill(dR_A1);
+                histohelp->GetTH1D(histoHelper::hashDeltaR_A3_fake)->Fill(dR_A3);
+                histohelp->GetTH1D(histoHelper::hashPTLambda_A_fake)->Fill(LambdaPtA);
+                histohelp->GetTH1D(histoHelper::hashXLambda_fake)->Fill(X_Lambda);
+            }
         }
         LambdaCand.push_back(iTrackPair);
     }
@@ -617,50 +617,52 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
       float bins_deltaR[100] = {};
       float bins_deltaR3[100] = {};
       float bins_Lmass[100] = {};
+      float bins_vertex[100] = {};
       bins_xlambda[j] = (histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinContent(j));
       bins_deltaR[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A)->GetBinContent(j));
       bins_deltaR3[j] = (histohelp->GetTH1D(histoHelper::hashDeltaR_A3)->GetBinContent(j));
       bins_Lmass[j] = (histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->GetBinContent(j));
+      bins_vertex[j] = (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(j));
       if (pdgid == 3){
           // fuer ssbar, jeweils xlambda und deltaR
-          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << "\t" << bins_vertex[j] << endl;
       }
       if (pdgid == 1){
           // fuer ddbar
-          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << "\t" << bins_vertex[j] << endl;
       }
       if (pdgid == 2){
           // fuer uubar
-          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << endl;
+          ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << "\t" << bins_vertex[j] << endl;
       }
   }
-
-  float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
-  float lbordervv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinLowEdge(0);
-  float cutsvxvy[29] = {100., 90., 80., 70., 60., 50., 40., 30., 20., 19., 18., 17., 16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1., 0.};
-  for (int j = 0; j < 29; j++){
-      float distvv = abs(lbordervv - cutsvxvy[j]);
-      int N = distvv / wvv;
-      float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
-      float leftAreavv = 0;
-      float rightAreavv = 0;
-      for (int a = 0; a < N; a++){
-          leftAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(a));
-      }
-      for (int b = N; b < end; b++){
-          rightAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(b));
-      }
-      // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
-      if (pdgid == 3){
-          ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
-      }
-      if (pdgid == 1){
-          ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
-      }
-      if (pdgid == 2){
-          ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
-      }
-  }
+  //
+  // float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
+  // float lbordervv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinLowEdge(0);
+  // float cutsvxvy[29] = {100., 90., 80., 70., 60., 50., 40., 30., 20., 19., 18., 17., 16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1., 0.};
+  // for (int j = 0; j < 29; j++){
+  //     float distvv = abs(lbordervv - cutsvxvy[j]);
+  //     int N = distvv / wvv;
+  //     float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
+  //     float leftAreavv = 0;
+  //     float rightAreavv = 0;
+  //     for (int a = 0; a < N; a++){
+  //         leftAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(a));
+  //     }
+  //     for (int b = N; b < end; b++){
+  //         rightAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(b));
+  //     }
+  //     // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
+  //     if (pdgid == 3){
+  //         ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+  //     }
+  //     if (pdgid == 1){
+  //         ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+  //     }
+  //     if (pdgid == 2){
+  //         ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
+  //     }
+  // }
 // ------------------
 
   // clean up and end program happily
@@ -749,31 +751,31 @@ int main() {
     ofstream rocdata3;
     rocdata3.open("rocwerte_uubar.txt");
 
-    // for XLambda
-    ofstream vxvy1;
-    vxvy1.open("vxvywerte_ssbar.txt");
-    ofstream vxvy2;
-    vxvy2.open("vxvywerte_ddbar.txt");
-    ofstream vxvy3;
-    vxvy3.open("vxvywerte_uubar.txt");
+    // for absvertex1
+    // ofstream vxvy1;
+    // vxvy1.open("vxvywerte_ssbar.txt");
+    // ofstream vxvy2;
+    // vxvy2.open("vxvywerte_ddbar.txt");
+    // ofstream vxvy3;
+    // vxvy3.open("vxvywerte_uubar.txt");
 
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, rocdata1, vxvy1);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, rocdata2, vxvy2);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, rocdata3, vxvy3);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, rocdata1);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, rocdata2);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, rocdata3);
   mittel1.close();
   mittel2.close();
   mittel3.close();
   rocdata1.close();
   rocdata2.close();
   rocdata3.close();
-  vxvy1.close();
-  vxvy2.close();
-  vxvy3.close();
+  // vxvy1.close();
+  // vxvy2.close();
+  // vxvy3.close();
   // end happily
   return 0;
 }
