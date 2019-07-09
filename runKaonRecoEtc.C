@@ -20,7 +20,7 @@ bool sortfunction(pair<int,float> v1, pair<int,float> v2) {
   return (v1.second > v2.second); // descending order
 }
 
-int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2) {
+int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, ofstream &ifile3) {
 
   gSystem->Load("AutoDict_vector_vector_float____cxx.so");
 
@@ -608,7 +608,7 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
   histohelp->finalize(histofilename);
 
   // ------------------
-  // wegspeichern der bineintraege in python array
+  // wegspeichern der bineintraege in python array fuer lambdas
   // ------------------
   float w0 = histohelp->GetTH1D(histoHelper::hashXLambda)->GetBinWidth(0);
   int N = 1/w0;
@@ -636,33 +636,30 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
           ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << "\t" << bins_vertex[j] << endl;
       }
   }
-  //
-  // float wvv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinWidth(0);
-  // float lbordervv = histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinLowEdge(0);
-  // float cutsvxvy[29] = {100., 90., 80., 70., 60., 50., 40., 30., 20., 19., 18., 17., 16., 15., 14., 13., 12., 11., 10., 9., 8., 7., 6., 5., 4., 3., 2., 1., 0.};
-  // for (int j = 0; j < 29; j++){
-  //     float distvv = abs(lbordervv - cutsvxvy[j]);
-  //     int N = distvv / wvv;
-  //     float end = 75; // anzahl an bins des histogramms -> am besten fuer alle gleich!
-  //     float leftAreavv = 0;
-  //     float rightAreavv = 0;
-  //     for (int a = 0; a < N; a++){
-  //         leftAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(a));
-  //     }
-  //     for (int b = N; b < end; b++){
-  //         rightAreavv += (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(b));
-  //     }
-  //     // cout << "j = " << j << ", a: " << leftArea << ", b: " << rightArea << endl;
-  //     if (pdgid == 3){
-  //         ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
-  //     }
-  //     if (pdgid == 1){
-  //         ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
-  //     }
-  //     if (pdgid == 2){
-  //         ifile3 << j << "\t" << leftAreavv << "\t" << rightAreavv << endl;
-  //     }
-  // }
+
+ // for kaons just do compare both algorithms
+ float width = histohelp->GetTH1D(histoHelper::hashKaonXk)->GetBinWidth(0);
+ int binwidth = 1/width;
+ for (int j = 0; j < binwidth; j++){
+     float bins_xk[100] = {};
+     float bins_dR_kaon[100] = {};
+     float bins_kaonmass[100] = {};
+     bins_xk[j] = (histohelp->GetTH1D(histoHelper::hashKaonXk)->GetBinContent(j));
+     bins_dR_kaon[j] = (histohelp->GetTH1D(histoHelper::hashRecoKaonCandDeltaR_to_jet_before_sel)->GetBinContent(j));
+     bins_kaonmass[j] = (histohelp->GetTH1D(histoHelper::hashRecoKaonCandInvMass_before_sel)->GetBinContent(j));
+     if (pdgid == 3){
+         // fuer ssbar, jeweils xlambda und deltaR
+         ifile3 << j << "\t" << bins_xk[j] << "\t" << bins_dR_kaon[j] << "\t" << bins_kaonmass[j] << endl;
+     }
+     if (pdgid == 1){
+         // fuer ddbar
+         ifile3 << j << "\t" << bins_xk[j] << "\t" << bins_dR_kaon[j] << "\t" << bins_kaonmass[j] << endl;
+     }
+     if (pdgid == 2){
+         // fuer uubar
+         ifile3 << j << "\t" << bins_xk[j] << "\t" << bins_dR_kaon[j] << "\t" << bins_kaonmass[j] << endl;
+     }
+ }
 // ------------------
 
   // clean up and end program happily
@@ -751,31 +748,29 @@ int main() {
     ofstream rocdata3;
     rocdata3.open("rocwerte_uubar.txt");
 
-    // for absvertex1
-    // ofstream vxvy1;
-    // vxvy1.open("vxvywerte_ssbar.txt");
-    // ofstream vxvy2;
-    // vxvy2.open("vxvywerte_ddbar.txt");
-    // ofstream vxvy3;
-    // vxvy3.open("vxvywerte_uubar.txt");
-
+    ofstream rocKaon1;
+    rocKaon1.open("roc_kaon_ssbar.txt");
+    ofstream rocKaon2;
+    rocKaon2.open("roc_kaon_ddbar.txt");
+    ofstream rocKaon3;
+    rocKaon3.open("roc_kaon_uubar.txt");
   // runKaonRecoEtc("../data/s_10k.root", 3);
   // runKaonRecoEtc("../data/d_10k.root", 1);
   // runKaonRecoEtc("../data/u_10k.root", 2);
   // runKaonRecoEtc("../data/s_10M.root", 3);
   // runKaonRecoEtc("../data/d_10M.root", 1);
-  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, rocdata1);
-  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, rocdata2);
-  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, rocdata3);
+  runKaonRecoEtc("../../data/ssbar-res-phi-corrected.root", 3, mittel1, rocdata1, rocKaon1);
+  runKaonRecoEtc("../../data/ddbar-res-phi-corrected.root", 1, mittel2, rocdata2, rocKaon2);
+  runKaonRecoEtc("../../data/uubar-res-phi-corrected.root", 2, mittel3, rocdata3, rocKaon3);
   mittel1.close();
   mittel2.close();
   mittel3.close();
   rocdata1.close();
   rocdata2.close();
   rocdata3.close();
-  // vxvy1.close();
-  // vxvy2.close();
-  // vxvy3.close();
+  rocKaon1.close();
+  rocKaon2.close();
+  rocKaon3.close();
   // end happily
   return 0;
 }
