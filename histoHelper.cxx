@@ -75,7 +75,7 @@ histoHelper::histoHelper(int pdgid) {
   // neue hist: inv.Mass, pT, x, deltaR, fuer rekonstruierte kaons
   NewTH1D("KaonInvMass", 50, 470., 530., "Invariant Kaon Mass[MeV]", "No. of Kaons / bin", kZeroMax);
   NewTH1D("KaonPT", 50., 0., 35., "Kaon transverse momentum[GeV]", "No. of Kaons / bin", kZeroMax);
-  NewTH1D("KaonXk", 50, 0., 1., "pT(Kaon)/pT(Jet)", "No. of Jets / bin", kZeroMax);
+  NewTH1D("KaonXk", 100, 0., 1., "pT(Kaon)/pT(Jet)", "No. of Jets / bin", kZeroMax);
   NewTH1D("KaonDeltaR", 50, 0., 2*M_PI, "#Delta_R", "No. of Kaons / bin", kZeroMax);
   NewTH1D("JetPTforKaon", 50, 0., 90., " #Pt [GeV]", "No. of kaons / bin", kZeroMax);
   NewTH1D("TruthNOtherKaons", 6, 0., 6., "No. of K_s", "No. of kaons / bin", kZeroMax);

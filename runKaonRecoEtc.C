@@ -624,7 +624,7 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
       bins_Lmass[j] = (histohelp->GetTH1D(histoHelper::hashLInvMass_true_p_pi)->GetBinContent(j));
       bins_vertex[j] = (histohelp->GetTH1D(histoHelper::hashabsvertex1)->GetBinContent(j));
       if (pdgid == 3){
-          // fuer ssbar, jeweils xlambda und deltaR
+          // fuer ssbar, jeweils xlambda und deltaR und die invariante masse
           ifile2 << j << "\t" << bins_xlambda[j] << "\t" << bins_deltaR[j] << "\t" << bins_Lmass[j] << "\t" << bins_deltaR3[j] << "\t" << bins_vertex[j] << endl;
       }
       if (pdgid == 1){
@@ -648,7 +648,7 @@ for (unsigned int iLambdaCand1(0); iLambdaCand1 < LambdaCand.size(); ++iLambdaCa
      bins_dR_kaon[j] = (histohelp->GetTH1D(histoHelper::hashRecoKaonCandDeltaR_to_jet_before_sel)->GetBinContent(j));
      bins_kaonmass[j] = (histohelp->GetTH1D(histoHelper::hashRecoKaonCandInvMass_before_sel)->GetBinContent(j));
      if (pdgid == 3){
-         // fuer ssbar, jeweils xlambda und deltaR
+         // fuer ssbar, jeweils xk und deltaR und die invariante masse
          ifile3 << j << "\t" << bins_xk[j] << "\t" << bins_dR_kaon[j] << "\t" << bins_kaonmass[j] << endl;
      }
      if (pdgid == 1){
