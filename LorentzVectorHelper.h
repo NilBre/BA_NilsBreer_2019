@@ -18,10 +18,8 @@ class LorentzVectorHelper {
   TLorentzVector getKaonShortDaughter1TLV(int idx);
   TLorentzVector getKaonShortDaughter2TLV(int idx);
 
-  TLorentzVector getLambdaDaughterP1TLV(int idx);
-  TLorentzVector getLambdaDaughterP2TLV(int idx);
-  TLorentzVector getLambdaDaughterPi1TLV(int idx);
-  TLorentzVector getLambdaDaughterPi2TLV(int idx);
+  TLorentzVector getLambdaDaughter1TLV(int idx);
+  TLorentzVector getLambdaDaughter2TLV(int idx);
 
   TLorentzVector getGenJetTLV(int idx);
   TLorentzVector getJetTLV(int idx);

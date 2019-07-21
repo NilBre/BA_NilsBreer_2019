@@ -47,33 +47,20 @@ TLorentzVector LorentzVectorHelper::getKaonShortDaughter2TLV(int idx) {
                 kPionMass);
 }
 //--------------
-TLorentzVector LorentzVectorHelper::getLambdaDaughterP1TLV(int idx){
+TLorentzVector LorentzVectorHelper::getLambdaDaughter1TLV(int idx){
     return getTLV((*fTree->LambdaDaughter1_PT)[idx],
                   (*fTree->LambdaDaughter1_Eta)[idx],
                   (*fTree->LambdaDaughter1_Phi)[idx],
                   kProtonMass);
 }
 
-TLorentzVector LorentzVectorHelper::getLambdaDaughterP2TLV(int idx){
-    return getTLV((*fTree->LambdaDaughter2_PT)[idx],
-                  (*fTree->LambdaDaughter2_Eta)[idx],
-                  (*fTree->LambdaDaughter2_Phi)[idx],
-                  kProtonMass);
-}
-
-TLorentzVector LorentzVectorHelper::getLambdaDaughterPi1TLV(int idx){
-    return getTLV((*fTree->LambdaDaughter1_PT)[idx],
-                  (*fTree->LambdaDaughter1_Eta)[idx],
-                  (*fTree->LambdaDaughter1_Phi)[idx],
-                  kPionMass);
-}
-
-TLorentzVector LorentzVectorHelper::getLambdaDaughterPi2TLV(int idx){
+TLorentzVector LorentzVectorHelper::getLambdaDaughter2TLV(int idx){
     return getTLV((*fTree->LambdaDaughter2_PT)[idx],
                   (*fTree->LambdaDaughter2_Eta)[idx],
                   (*fTree->LambdaDaughter2_Phi)[idx],
                   kPionMass);
 }
+
 //---------
 TLorentzVector LorentzVectorHelper::getGenJetTLV(int idx) {
   return getTLV((*fTree->GenJet_PT)[idx],

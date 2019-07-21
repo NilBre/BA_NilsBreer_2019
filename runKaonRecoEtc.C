@@ -155,23 +155,17 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
               countToOtherLambda += countOtherLamb;
               continue;
           }
-          nLambdasInTruth++;
-          counterToLambda += nLambdasInTruth;
-      // if (((*tree->LambdaDaughter1_PID)[iLambda] == 2212 && (*tree->LambdaDaughter2_PID)[iLambda] == -211)
-      // || ((*tree->LambdaDaughter1_PID)[iLambda] == -211 && (*tree->LambdaDaughter2_PID)[iLambda] == 2212)){
-      //     nLambdasInTruth++;
-      //     counterToLambda += nLambdasInTruth;
-      // }
-      // else{
-      //     countOtherLamb++;
-      //     countToOtherLambda += countOtherLamb;
-      //     continue;
-      // }
-
-      // TLorentzVector vLDaughterP1 = lvhelp->getLambdaDaughterP1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
-      // TLorentzVector vLDaughterP2 = lvhelp->getLambdaDaughterP2TLV(iLambda);
-      // TLorentzVector vLDaughterPi1 = lvhelp->getLambdaDaughterPi1TLV(iLambda); // in TLorentzVectoren sind jeweils immer Pt, eta, phi, evtl mass gespeichert
-      // TLorentzVector vLDaughterPi2 = lvhelp->getLambdaDaughterPi2TLV(iLambda);
+      // else if ((*tree->LambdaDaughter1_PID)[iLambda] != 211 &&
+      //       (*tree->LambdaDaughter2_PID)[iLambda] != 2212)
+      //     {
+      //         countOtherLamb++;
+      //         countToOtherLambda += countOtherLamb;
+      //         continue;
+      //     }
+      nLambdasInTruth++;
+      counterToLambda += nLambdasInTruth;
+      TLorentzVector vLDaughter1 = lvhelp->getLambdaDaughter1TLV(iLambda);
+      TLorentzVector vLDaughter2 = lvhelp->getLambdaDaughter2TLV(iLambda);
   }
   histohelp->GetTH1D(histoHelper::hashTruthNlambdas)->Fill(nLambdasInTruth);
       // -----------------------------------
