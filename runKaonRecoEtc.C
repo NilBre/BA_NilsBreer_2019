@@ -410,11 +410,11 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
         {
             TLorentzVector vLambda_Ref = lvhelp->getLambdaTLV(i); // lambda referenz
             TLorentzVector vIsLambdaJet = lvhelp->getJetTLV(idx_leadingJet);
-            if (vJet.DeltaR(vLambda_Ref) < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
+            if (vIsLambdaJet.DeltaR(vLambda_Ref) < 0.5) // cut auf deltaR = 0.5: alles kleiner sind true lambdas, alles > 0.5 sind fakes
             { // true teilchen, wenn dR < 0.5
-                TLorentzVector vTrack1 = lvhelp->getTrackTLV(trackPairs[iTrackPair].first, LorentzVectorHelper::kProtonMass);
+                TLorentzVector vTrack1 = lvhelp->getTrackTLV(trackPairs[i].first, LorentzVectorHelper::kProtonMass);
                 TLorentzVector vTrack2 = lvhelp->getTrackTLV(trackPairs[iTrackPair].second, LorentzVectorHelper::kPionMass);
-                if (vTrack1.DeltaR(vJet) > 0.5 || vTrack2.DeltaR(vJet) > 0.5)
+                if (vTrack1.DeltaR(vIsLambdaJet) > 0.5 || vTrack2.DeltaR(vIsLambdaJet) > 0.5)
                 {
                     continue;
                 }
@@ -425,7 +425,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                     continue;
                 }
                 // bestimme die PIDs der spuren
-                float TrackPID1 = (*tree->Track_PID)[trackPairs[iTrackPair].first];  // pids beider spuren
+                float TrackPID1 = (*tree->Track_PID)[trackPairs[i].first];  // pids beider spuren
                 float TrackPID2 = (*tree->Track_PID)[trackPairs[iTrackPair].second];
                 // wirft alle pi+pi- paare raus->in die fakes
                 if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
@@ -440,7 +440,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                     float JetPtA = vIsLambdaJet.Pt();
                     float X_Lambda = LambdaPtA / JetPtA;
                     // vertexpositionen x, y:
-                    float Vx1 = (*tree->Track_X)[trackPairs[iTrackPair].first];
+                    float Vx1 = (*tree->Track_X)[trackPairs[i].first];
                     float Vy1 = (*tree->Track_Y)[trackPairs[iTrackPair].second];
                     float d1 = sqrt(Vx1*Vx1 + Vy1*Vy1);
                     // histohelp->GetTH1D(histoHelper::hashDeltaR_A)->Fill(dR_A1);
