@@ -34,7 +34,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
   float jetDR = 0.5;
   // minimum track pT (used for tracks (and on truth level for pions))
   float minTrackPt = 0.1; // [GeV]
-  float minTrackPT_lambda = 0.5;
+  float minTrackPT_lambda = 1; // [GeV]
   float maxTrackEta = 20;
 
  //  float minTrackPt_Lambda = 0.5; // [GeV]
@@ -421,7 +421,7 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                 TLorentzVector LambdaCandidate_A = vTrack1 + vTrack2;
                 float dR_A3 = LambdaCandidate_A.DeltaR(vIsLambdaJet); // deltaR zwischen candidate und jet -> muesste eigentlich mit vIsLambdaJet verglichen werden...
                 float LInvMass_p_pi = LambdaCandidate_A.M(); // invariante masse von T1 und T2, also dem candidate
-                if (LambdaCandidate_A.Pt() < 0.5){ // minimum candidate Pt von 500 MeV
+                if (LambdaCandidate_A.Pt() < minTrackPT_lambda){ // minimum candidate Pt von 500 MeV
                     continue;
                 }
                 // bestimme die PIDs der spuren
@@ -431,6 +431,11 @@ int runKaonRecoEtc(string path, int pdgid, ofstream &ifile1, ofstream &ifile2, o
                 if ((TrackPID1 == 211 && TrackPID2 == -211) || (TrackPID1 == -211 && TrackPID2 == 211)) // wirf alle uebrigen kaon candidates raus
                 {
                     histohelp->GetTH1D(histoHelper::hashLInvMass_fake_p_pi)->Fill(LInvMass_p_pi*1000);
+                    counter_fake += 1;
+                    continue;
+                }
+                if ((TrackPID1 == -2212 && TrackPID2 == 211) || (TrackPID1 == 211 && TrackPID2 == -2212))
+                {
                     counter_fake += 1;
                     continue;
                 }
