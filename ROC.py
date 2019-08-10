@@ -98,8 +98,31 @@ for i in range(len(cuts)):
     tpr4.append(truePos4 / totalssbar_XL)
     fpr4.append(1 - (frueNeg4 / totaluubar_XL))
 
-# for lambdaMass
-# for i in range(len(cuts)):
+# for M_Lambda (noch korrigieren)
+#---------
+for i in range(len(cuts)):
+    truePos5 = 0
+    frueNeg5 = 0
+    k = 0
+    while k <= i:
+        truePos5 += cx1[k]
+        frueNeg5 += cx2[k]
+        k += 1
+    tpr5.append(truePos5 / totalssbar_XL)
+    fpr5.append(1 - (frueNeg5 / totalddbar_XL))
+
+for i in range(len(cuts)):
+    truePos6 = 0
+    frueNeg6 = 0
+    k = 0
+    while k <= i:
+        truePos6 += cx1[k]
+        frueNeg6 += cx3[k]
+        k += 1
+    tpr6.append(truePos6 / totalssbar_XL)
+    fpr6.append(1 - (frueNeg6 / totaluubar_XL))
+#---------
+# for i in range(len(zusammen)):
 #     truePos5 = 0
 #     frueNeg5 = 0
 #     k = 0
@@ -110,7 +133,7 @@ for i in range(len(cuts)):
 #     tpr5.append(truePos5 / totalddbar_XL)
 #     fpr5.append(1 - (frueNeg5 / totalssbar_XL))
 #
-# for i in range(len(cuts)):
+# for i in range(len(zusammen)):
 #     truePos6 = 0
 #     frueNeg6 = 0
 #     k = 0
@@ -120,28 +143,6 @@ for i in range(len(cuts)):
 #         k += 1
 #     tpr6.append(truePos6 / totaluubar_XL)
 #     fpr6.append(1 - (frueNeg6 / totalssbar_XL))
-
-for i in range(len(zusammen)):
-    truePos5 = 0
-    frueNeg5 = 0
-    k = 0
-    while k <= i:
-        truePos5 += cx2[k]
-        frueNeg5 += cx1[k]
-        k += 1
-    tpr5.append(truePos5 / totalddbar_XL)
-    fpr5.append(1 - (frueNeg5 / totalssbar_XL))
-
-for i in range(len(zusammen)):
-    truePos6 = 0
-    frueNeg6 = 0
-    k = 0
-    while k <= i:
-        truePos6 += cx3[k]
-        frueNeg6 += cx1[k]
-        k += 1
-    tpr6.append(truePos6 / totaluubar_XL)
-    fpr6.append(1 - (frueNeg6 / totalssbar_XL))
 
 # for vertex positions
 for i in range(len(cuts)):
@@ -167,9 +168,9 @@ for i in range(len(cuts)):
     fpr8.append(1 - (frueNeg8 / totalssbar_XL))
 
 # dieser plot nur zwischen ssbar und ddbar
-plt.plot(fpr1, tpr1, "k--", label="X_Lambda")
-plt.plot(fpr3, tpr3, "b--", label="DeltaR")
-plt.plot(fpr5, tpr5, "g--", label="M_Lambda")
+plt.plot(fpr1, tpr1, "k--", label=r"$X_{\Lambda}$")
+plt.plot(fpr3, tpr3, "b--", label=r"$\Delta R$")
+plt.plot(fpr5, tpr5, "g--", label=r"$M_{\Lambda}$")
 # plt.plot(fpr7, tpr7, "y--", label="origin pos.")
 # plt.plot(fpr31, tpr31, "b--", label="DeltaR_alt1")
 plt.plot([0,1], [1,0], "r-", label="random values")
@@ -183,9 +184,9 @@ plt.ylabel("sensitivity(s)")
 plt.savefig("py_output/ROC_s_d.pdf")
 plt.clf()
 
-plt.plot(fpr2, tpr2, "k--", label="X_Lambda")
-plt.plot(fpr4, tpr4, "b--", label="DeltaR")
-plt.plot(fpr6, tpr6, "g--", label="M_Lambda")
+plt.plot(fpr2, tpr2, "k--", label=r"$X_{\Lambda}$")
+plt.plot(fpr4, tpr4, "b--", label=r"$\Delta R$")
+plt.plot(fpr6, tpr6, "g--", label=r"$M_{\Lambda}$")
 # plt.plot(fpr8, tpr8, "y--", label="origin pos.")
 # plt.plot(fpr32, tpr32, "b--", label="DeltaR_alt1")
 plt.plot([0,1], [1,0], "r-", label="random values")
