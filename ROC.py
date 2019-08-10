@@ -75,7 +75,9 @@ for i in range(len(cuts)):
     tpr2.append(truePos2 / totaluubar_XL)
     fpr2.append(1 - (frueNeg2 / totalssbar_XL))
 
-# for deltaR
+np.savetxt("ROC_values.txt", np.transpose([cuts, tpr1, fpr1, tpr2, fpr2]), delimiter=",", fmt='%1.4e')
+
+# for delta R
 for i in range(len(cuts)):
     truePos3 = 0
     frueNeg3 = 0
