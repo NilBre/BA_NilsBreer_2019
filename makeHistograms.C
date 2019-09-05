@@ -57,9 +57,9 @@ int main() {
   // TString legendentry1 = "s-Jets_10M";
   // TString legendentry2 = "d-Jets_10M";
   // ---------------------
-  TString legendentry1 = "ssbar sample";
-  TString legendentry2 = "ddbar sample";
-  TString legendentry3 = "uubar sample";
+  TString legendentry1 = "pp -> ss~";
+  TString legendentry2 = "pp -> dd~";
+  TString legendentry3 = "pp -> uu~";
 
   // create canvas and draw histogram(s)
   draw(myFile1, myFile2, myFile3, "TruthJetPt_before_sel", "", "", "", legendentry1, legendentry2, legendentry3);
